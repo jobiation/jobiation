@@ -1,0 +1,5 @@
+command
+config t
+
+end
+write

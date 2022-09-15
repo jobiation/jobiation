@@ -1,0 +1,17 @@
+adsf
+10.18.203.2
+ adsfljsd !
+1
+afsd
+1234
+
+interface GigabitEthernet0/0/0
+
+
+ip address 39.32.120.37 255.255.255.252
+
+dsf
+
+asdf
+
+interface GigabitEthernet0/0/1

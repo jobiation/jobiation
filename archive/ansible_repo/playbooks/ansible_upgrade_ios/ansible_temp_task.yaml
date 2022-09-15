@@ -1,0 +1,35 @@
+﻿---
+- name: Upgrade IOS
+  hosts: tempinventory
+  gather_facts: no
+  connection: local
+  vars:
+    ansible_command_timeout: 7200
+  tasks:
+  - name: Copy IOS to devices
+    cli_command:
+      command: copy http://10.1.1.1/c1100-universalk9_ias.17.03.04a.SPA.bin flash
+      check_all: true
+      prompt:
+        - 'Destination filename [c1100-universalk9_ias.17.03.04a.SPA.bin]?'
+      answer:
+        - 'c1100-universalk9_ias.17.03.04a.SPA.bin'
+  - name: Set boot system cmd on devices
+    ios_command:
+      commands:
+        - configure terminal
+        - no boot system
+        - boot system flash:/c1100-universalk9_ias.17.03.04a.SPA.bin
+        - config-register 0x2102
+        - end
+  - name: Write-Reload
+    cli_command:
+      command: 'write'
+  - name:
+    cli_command:
+      command: 'reload in 720'
+      check_all: True
+      prompt:
+        - 'Confirm'
+      answer:
+        - 'y'

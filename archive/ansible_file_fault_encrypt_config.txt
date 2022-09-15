@@ -1,0 +1,21 @@
+
+Configuring Ansible File vault
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+First create the encrypted password string:
+
+ansible-vault encrypt_string --vault-id ansiblevaultuser@prompt 'mydevicepassword' --name 'ansible_password'
+
+Copy the password you typed at the prompt to /path/to/my/ansiblecreds.txt
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+Next put the encrpted password in your YAML formatted host file:
+
+
+//////////////////////////////////////////////////////////////////////////////////////
+
+Call the playbook with the --vault-id option
+
+/usr/bin/ansible-playbook --vault-id ansiblevaultuser@/path/to/my/ansiblecreds.txt "/etc/ansible/playbooks/myplaybook.yml"

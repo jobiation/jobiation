@@ -1,0 +1,47 @@
+---
+- name: Temp Playbook
+  hosts: tonyswitch
+  gather_facts: no
+  connection: local
+  vars:
+    ansible_command_timeout: 30
+  tasks:       
+    - name: create loop back
+      ios_command:
+        commands:
+          - 'config t'
+          - 'interface loopback25'
+          - 'ip address 10.1.255.245 255.255.255.255'
+
+# - name: Upgrade 4507s
+#   hosts: cat4507s
+#   gather_facts: no
+#   vars:
+#     ansible_command_timeout: 1200
+#   tasks:
+#     - name: Copy IOS to switch
+#       cli_command:
+#         command: 'copy tftp://10.1.1.1/cat4500e-lanbasek9-mz.152-2.E8.bin bootflash'
+#         check_all: true
+#         prompt:
+#           - 'Destination filename [cat4500e-lanbasek9-mz.152-2.E8.bin]?'
+#         answer:
+#           - 'cat4500e-lanbasek9-mz.152-2.E8.bin'          
+#     - name: Chage boot system commands
+#       ios_command:
+#         commands:
+#           - 'config t'
+#           - 'no boot system bootflash:cat4500e-lanbasek9-mz.150-2.SG10.bin'
+#           - 'boot system bootflash:cat4500e-lanbasek9-mz.152-2.E8.bin'
+#           - 'boot system bootflash:cat4500e-lanbasek9-mz.150-2.SG10.bin'
+#           - 'end'
+#     - name: Reload at 20:00
+#       cli_command:
+#         command: 'reload at 20:00'
+#         check_all: true
+#         prompt:
+#           - 'confirm'
+#           - 'save'
+#         answer:
+#           - 'y' 
+#           - 'y'

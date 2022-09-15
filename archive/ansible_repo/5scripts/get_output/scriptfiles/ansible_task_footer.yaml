@@ -1,0 +1,17 @@
+﻿---
+- name: Get_Output
+  hosts: tempinventory
+  gather_facts: no
+  connection: local
+  vars:
+    ansible_command_timeout: 30
+  tasks:
+  - name: run_show_command
+    ios_command:
+      commands: show run
+    register: output
+  - name: show_output
+    debug:
+      var: output.stdout
+  - name: copy_output_to_file
+    copy: content="{{ output.stdout[0] }}" dest="tmp/output/{{ inventory_hostname }}.txt"

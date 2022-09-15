@@ -1,0 +1,66 @@
+4Scripts Notes:
+
+Figure out what characters cannot be used in the csv file.
+Learn how to pull facts
+For the upgrade ios module, make the shell script contain multiple ansible-playbook commands so that
+When using the hosts file, copy the ansible vault creds along with the hosts_headers file. You can also have power shell prompt for the ansible vault password and build it on the windows machine.
+How to run cron jobs
+If they have search criteria, make it a two step process. Have them run get_output and mark the devices and then run send_commands or the ACL module.
+
+Stuff to mention:
+When the playbook opens up, you can edit it, save it and deploy it.
+diffie-helman errors
+Backup your hosts file before you start.
+If you have a command that has prompts other than a restart or a file copy, insert it yourself.
+Show then how to use plink or putty
+
+Improvements:
+Make second column for a second managed ACL. Or prompt for column
+Make sure every option.py value is validated.
+Make an ACL group called manual for single ACLs not part of a group. Make it so you can have mutiple manual groups and have their files in sub folders.
+Make the options file 600
+Ask if they used variables and do a simplified playbook if not.
+Ask which variables they used to speed up task
+Commands that have prompts
+If the user has conditions, ask them what column they want to mark
+Make a hosts file and a hosts record file
+Have all variables in the options file and only prompt them if it is blank
+In the get_output module, make a file called searches and allow them to specify a command and the search criteria
+Figure out how to make the text editor open the playbook and hosts file.
+If they have no search criteria and they are just running a backup, then search criteria can be blank
+You can specify the location of the password file in ansible.cfg, that way you don't have to include it in the bash file
+Allow them multiple hosts_header files
+Configure a read-only account for pulling backups and facts
+Check what variables the user used and only replace those variables
+All devices must start with enable or not with enable
+
+Regex notes:
+Find a string on one line and then another string within a specified number or range of subsequent lines.
+Common regexes: IP and subnet mask in CIDR and long, wild card mask.
+Process file from bottom up
+
+Questions for users:
+
+get_output:
+Did you specify your search criteria? (if set to 1)
+What column do you want to mark? (if not specified)
+
+search_output:
+Do you want to run search criteria against a backup?
+
+send_commands:
+Did you use variables in your commands? (if not it will be faster)
+Do you want to do a restart?
+Do you want to do a write?
+
+ACLs
+Did you use variables?
+Do you have any conditions? If so do you want to use an existing backup or pull a new one? What column do you want to mark?
+Do you want to do a restart?
+ACL group? - If they type manual, ask them the manual group name.
+ACL column?
+
+
+upgrade OS:
+
+

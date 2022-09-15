@@ -1,0 +1,19 @@
+---
+- name: Get Nexus Temp
+  hosts: nexus7009
+  gather_facts: no
+  connection: local
+  vars:
+    ansible_command_timeout: 30
+  tasks:
+   - name: show environment temp
+     ios_command:
+      commands: show environment temp
+     register: output
+   - name: show output
+     debug:
+      var: output.stdout
+   - name: copy output to file
+     copy: content="{{ output.stdout[0] }}" dest=/var/local/deepnexustemp.txt
+
+#
