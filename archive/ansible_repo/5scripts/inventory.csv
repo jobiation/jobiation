@@ -1,3 +1,0 @@
-devicename,active,ip,location,model,arg1,arg2,arg3,aclgrp,aclname,aclsub1,aclsub2,aclint1,aclint1dir,aclint2,aclint2dir,aclpostadd,aclpreadd,acllastcmd,dummy-required
-skipline,active,ip,location,model,,,,,,,,,,,,,,,
-Myrouter,1,10.1.1.1,field,C1111,1,,,aclgrp1,TunnelACL,10.1.1.0 0.0.0.31,,Tunnel 16,out,,,,,deny ip any any log,
