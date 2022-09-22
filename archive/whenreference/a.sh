@@ -4,7 +4,7 @@
 
 import sys;
 import mmap;
-import re
+import re;
 
 
 with open('notes.txt', 'r') as file1:

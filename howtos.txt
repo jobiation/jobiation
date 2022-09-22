@@ -1,3 +1,0 @@
-
-Write when statement
-Use regex to search show command output
