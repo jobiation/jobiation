@@ -5,11 +5,12 @@ import sys
 import shutil
 import os
 
-hostsfile = open("tmp/hosts", "a+");
+hostsfile = open("../tmp/hosts", "a+");
+
 playbookfile = open("jobiation_task.yaml", "w+");
 playbookfile.write("---\n");
-inventoryfile = open("../inventory.csv", "r");
-commandsfile = open("commands.txt", "r");
+
+inventoryfile = open("../../inventory.csv", "r");
 
 with inventoryfile as csvfile:
     datareader = csv.reader(csvfile)
@@ -21,17 +22,19 @@ with inventoryfile as csvfile:
         arg2 = row[6];
 # Note that continue means skip.
 
-        if str(arg1) != "1":
-            continue;
+        # if str(arg1) != "1":
+        #     continue;
 
-        if str(active) != "1":
-            continue;
+        # if str(active) != "1":
+        #     continue;
 
         if str(devicename) == "devicename":
             continue;
 
         if str(devicename) == "skipline":
             continue;
+
+        print(devicename);
 
         hostsfile.write("       " + devicename + ":\n");
         hostsfile.write("         ansible_host: " + ip + "\n");
@@ -45,13 +48,36 @@ with inventoryfile as csvfile:
         playbookfile.write("  - name: " + devicename + "_commands\n");
         playbookfile.write("    ios_commands:\n");
         playbookfile.write("      commands:\n");
+
+        # Copy commands file
+        commandsfile = open("../commands.txt", "r");
+
         for cmd in commandsfile:
-            repstr = cmd;
-            repstr = repstr.replace('!devicename', devicename);
-            repstr = repstr.replace('!arg1', arg1);
-            repstr = repstr.replace('!arg2', arg2);
-            playbookfile.write('        - ' + repstr);
+            tempstr = cmd;
+            tempstr = tempstr.replace('!devicename', devicename);
+            tempstr = tempstr.replace('!arg1', arg1);
+            tempstr = tempstr.replace('!arg2', arg2);        
+            playbookfile.write("        - " + tempstr);
+
+
+
+# - name: disable_wifi
+#   hosts: disable_wifi_group
+#   gather_facts: no
+#   vars:
+#    ansible_command_timeout: 20
+#   connection: local
+#   tasks:
+#    - name: disable_wifi
+#      ios_command:
+#       commands:
+#        - 'config t'
+#        - 'int g0/2'
+#        - 'shut'
+# Close files
+# playbookfile.close();
 inventoryfile.close();
 hostsfile.close();
 playbookfile.close();
 commandsfile.close();
+replacementsfile.close();

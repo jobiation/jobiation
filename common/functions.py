@@ -13,13 +13,12 @@ def buildHosts(interperter, connection, os, port, user):
     hostsfile.write(" children:\n");
     hostsfile.write("   tempinventory:\n");
     hostsfile.write("     hosts:\n");
-    # hostsfile.write("\n");
 
     hostsfile.close();
 
 def catFiles():
-    filenames = ["scriptfiles/header.py", "scriptfiles/columns.py", "../host_conditions.py", "scriptfiles/footer.py"]
-    with open("scriptfiles/compiled.py", "w+") as new_file:
+    filenames = ["scriptfiles/header.py", "scriptfiles/columns.py", "../host_conditions.py", "scriptfiles/footer.py", "scriptfiles/replacements.py"]
+    with open("scriptfiles/compiled.py", "w") as new_file:
         for name in filenames:
             with open(name) as f:
                 for line in f:
