@@ -11,8 +11,8 @@ ansible_user = "me";
 use_hosts_header = 0; 
 
 # Playbook header options
-gather_facts = "no";
-ansible_command_timeout = "30";
+gather_facts = "yes";
+ansible_command_timeout = "31";
 connection = "local";
 cisco_platform = "ios_commands";
 
