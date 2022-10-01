@@ -1,0 +1,46 @@
+sudo apt install ansible
+sudo apt install python3-paramiko
+sudo apt install samba
+
+mkdir /home/jobiation
+useradd -d /home/jobiation jobiation
+chown jobiation /home/jobiation
+chgrp jobiation /home/jobiation
+chmod 770 /home/jobiation
+passwd jobiaion
+smbpasswd -a jobiation
+
+mkdir /var/local/jobiation
+chmod jobiation /var/local/jobiation
+chgrp jobiation /var/local/jobiation
+chmod 770 /var/local/jobiation
+
+nano /etc/samba/smb.conf
+
+[jobiation]
+  comment = local directory
+  browseable = yes
+  path = /var/local/jobiation
+  guest ok = no
+  read only = no
+  create mask = 0600
+  directory mask = 0700
+  valid users = root tony jobiation
+
+service smbd restart
+
+cp /usr/share/zoneinfo/EST5EDT /etc/localtime
+
+nano /etc/fstab
+//192.168.254.227/jobiation /home/tony/jobiation cifs vers=3.0,credentials=/home/tony/.smbcreds,iocharset=utf8 0 0
+
+#Clone Git
+git clone https://github.com/jobiation/jobiation.git
+
+# Git push
+git add . && git commit -m "Just another commit"
+git push
+
+nano /etc/ansible/ansible.cfg
+[defaults]
+host_key_checking = False

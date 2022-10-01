@@ -7,14 +7,14 @@ ansible_python_interpreter = "/usr/bin/python3";
 ansible_connection = "network_cli";
 ansible_network_os = "ios";
 ansible_port = "22";
-ansible_user = "me";
+ansible_user = "jobiation";
 use_hosts_header = 0; 
 
 # Playbook header options
-gather_facts = "yes";
-ansible_command_timeout = "31";
+gather_facts = "no";
+ansible_command_timeout = "30";
 connection = "local";
-cisco_platform = "ios_commands";
+cisco_product_line = "ios_command";
 
 root_dir = "";
 

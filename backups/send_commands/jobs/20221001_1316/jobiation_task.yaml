@@ -1,0 +1,16 @@
+---
+- name: jobiation_pb
+  hosts: jobiation_inventory
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: jobiation_commands
+     ios_command:
+      commands:
+       - config t
+       - logging host 10.18.101.86
+       - logging facility local5
+       - logging source-interface vlan 15
+       - end
+       - write
