@@ -16,28 +16,17 @@ ansible_command_timeout = "30";
 connection = "local";
 cisco_product_line = "ios_command";
 
-root_dir = "";
-
-# If this options is set to 1, then root_dir/common/hosts_header must exist.
-
-# Valid input: 1 or 0.
-# Saves the username in the jobs archive hosts file
 save_username = 1;
 
 add_when_condition = 0;
 
-hosts_conditions_prompt = 1; # 1 is prompt the user to look at the hosts conditions file, 0 is not.
-prompt_for_write = 1; # 1 means the user will be prompted to do a write before the playbook starts
-prompt_for_reload = 1; # 1 means the user will be prompted to do a reload and for the seconds
+reload_in = 60; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
 
-prompt_for_search_criteria = 1; # Asks the users if they completed the search_criteria.txt
 commands_to_remove = "adCf7 8jjd";
-output_retention = 30; # Specify the number of days
 
-output_dir = "/var/ansiblerepo/5scripts";
-ansible_dir = "/etc/ansible";
 
-################
+
+################ Input Validation
 boolreg =re.compile("^[0-1]$");
 numericreg =re.compile("^[0-9]$");
 alphanumericreg =re.compile("^([0-9]?[a-z]?[A-Z]?){1,20}$");

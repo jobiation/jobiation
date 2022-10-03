@@ -15,12 +15,6 @@ req_columns = [ "devicename", "ip", "active" ];
 # Import options file
 sys.path.insert(1, '../');
 import options
-# if options.use_hosts_header == 0:
-#     print("Not using hosts header");
-
-# Import functions
-sys.path.insert(1, '../common/');
-import functions
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -30,7 +24,7 @@ date_time = now.strftime("%Y%m%d_%H%M");
 os.mkdir('jobs/' + date_time);
 current_dir = "jobs/" + date_time;
 
-# Check if username is needed
+# Check if username is needed in the options file
 if(options.use_hosts_header == 1):
     print("Using hosts header");
     shutil.copyfile("../common/hosts_header", "jobs/hosts");
@@ -39,6 +33,10 @@ elif(options.ansible_user == ""):
     username = input("You do not have a username set. What username do you want to use? ");
 else:
     username = options.ansible_user;
+
+# Ask user if they want to do a write and reload
+if options.reload_in >= 1:
+    confirm = input("ATTENTION! You have the reload_1 option set to a non-zero value. Press enter to continue only if you understand your devices will be reloaded in " + str(options.reload_in) + " minutes.");
 
 # Build Hosts header if use_hosts_headeer == 0
 if(options.use_hosts_header == 0):
@@ -80,14 +78,8 @@ for flCol in range(len(flList)-1):
     if re.search("!"+flList[flCol], commands_content):
         replacements_required = replacements_required+1;
 
-# Set spacing
-# spacing = "    ";
-# if(replacements_required >= 1):
-#     spacing = "    ";
-#     print("spacing if executed");
-
 # Make temp python file
-tempfile = open("tempfile.py","w");
+tempfile = open("tmp/tempfile.py","w");
 
 # Add first part of script to tempfile.py
 tempfile.write("#!/usr/bin/env python3\n");
@@ -103,6 +95,7 @@ tempfile.write("commandsfile = open('commands.txt', 'r');\n");
 tempfile.write("playbookfile = open('" + current_dir + "/jobiation_task.yaml', 'w');\n");
 tempfile.write("playbookfile.write('---\\n');\n");
 
+# Write to playbook file in tempfile.py
 if(replacements_required == 0):
     tempfile.write("playbookfile.write('- name: jobiation_pb\\n');\n");
     tempfile.write("playbookfile.write('  hosts: jobiation_inventory\\n');\n");
@@ -110,6 +103,21 @@ if(replacements_required == 0):
     tempfile.write("playbookfile.write('  vars:\\n');\n");
     tempfile.write("playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
     tempfile.write("playbookfile.write('  tasks:\\n');\n");
+
+    # Add write and reload if desired
+    if options.reload_in >= 1:
+        tempfile.write("playbookfile.write('   - name: Write\\n');\n");
+        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write("playbookfile.write('       command: \"write\"\\n');\n");
+        tempfile.write("playbookfile.write('   - name: Reload\\n');\n");
+        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write("playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
+        tempfile.write("playbookfile.write('       check_all: True\\n');\n");
+        tempfile.write("playbookfile.write('       prompt:\\n');\n");
+        tempfile.write("playbookfile.write('         - \"Confirm\"\\n');\n");
+        tempfile.write("playbookfile.write('       answer:\\n');\n");
+        tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
+
     tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
     tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
     tempfile.write("playbookfile.write('      commands:\\n');\n");
@@ -127,7 +135,7 @@ vars_used = [];
 with open('../host_conditions.py', 'r') as hostcond_file:
     hostcond_content = hostcond_file.read();
 
-# Add required and used columns
+# Add required columns, columns used in host_conditions.py, and columns used in commands.txt
 for flCol in range(len(flList)-1):
     if flList[flCol] in req_columns:
         tempfile.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n");
@@ -146,10 +154,11 @@ for name in filenames:
         for line in f:
             tempfile.write(line)
 
-# Add commands for hosts file and playbook file
+# Add commands for hosts file to tempfile.py
 tempfile.write("        hostsfile.write('       ' + devicename + ':\\n');\n");
 tempfile.write("        hostsfile.write('         ansible_host: ' + ip + '\\n');\n");
 
+# Add commands for playbook file to tempfile.py
 if(replacements_required >= 1):
     tempfile.write("        playbookfile.write('- name: ' + devicename + '_pb\\n');\n");
     tempfile.write("        playbookfile.write('  hosts: ' + devicename + '\\n');\n");
@@ -157,6 +166,21 @@ if(replacements_required >= 1):
     tempfile.write("        playbookfile.write('  vars:\\n');\n");
     tempfile.write("        playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
     tempfile.write("        playbookfile.write('  tasks:\\n');\n");
+
+    # Add write and reload if desired
+    if options.reload_in >= 1:
+        tempfile.write("playbookfile.write('   - name: Write\\n');\n");
+        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write("playbookfile.write('       command: \"write\"\\n');\n");
+        tempfile.write("playbookfile.write('   - name: Reload\\n');\n");
+        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write("playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
+        tempfile.write("playbookfile.write('       check_all: True\\n');\n");
+        tempfile.write("playbookfile.write('       prompt:\\n');\n");
+        tempfile.write("playbookfile.write('         - \"Confirm\"\\n');\n");
+        tempfile.write("playbookfile.write('       answer:\\n');\n");
+        tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
+
     tempfile.write("        playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
     tempfile.write("        playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
     tempfile.write("        playbookfile.write('      commands:\\n');\n");
@@ -172,7 +196,7 @@ if(replacements_required >= 1):
     tempfile.write("            playbookfile.write('       - ' + repstr);\n");
     tempfile.write("        playbookfile.write('\\n###############################################################\\n');\n");
 
-# Add commands to close all files tempfile.py will open when it is executed
+# Add commands to tempfile.py to close all files.
 
 tempfile.write("\n");
 tempfile.write("inventoryfile.close();\n");
@@ -180,12 +204,14 @@ tempfile.write("hostsfile.close();\n");
 tempfile.write("playbookfile.close();\n");
 tempfile.write("commandsfile.close();");
 
-os.chmod("tempfile.py", 0o770);
+os.chmod("tmp/tempfile.py", 0o770);
 
 tempfile.close();
 
 # Execute the the compiled file completefile.py
-exec(open("tempfile.py").read());
+exec(open("tmp/tempfile.py").read());
+
+confirm = input("Your playbook and hosts file is ready. Please open them in " + current_dir + ". Make sure the commands are the commands you intend to perform on your Cisco devices. Press ENTER when ready.");
 
 bashfile = open("tmp/runplaybook.sh","w");
 bashfile.write('#!/bin/bash\n');
