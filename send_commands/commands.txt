@@ -1,3 +1,4 @@
 config t
+command !arg4
 end
 write

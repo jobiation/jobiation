@@ -8,7 +8,10 @@ ansible_connection = "network_cli";
 ansible_network_os = "ios";
 ansible_port = "22";
 ansible_user = "jobiation";
-use_hosts_header = 0; 
+use_hosts_header = 0;
+remove_hosts_header = 1;
+remove_username = 1;
+remove_password = 1;
 
 # Playbook header options
 gather_facts = "no";
@@ -16,24 +19,21 @@ ansible_command_timeout = "30";
 connection = "local";
 cisco_product_line = "ios_command";
 
-save_username = 1;
-
+# Send command options
 add_when_condition = 0;
+reload_in = -1; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
 
-reload_in = 60; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
-
-commands_to_remove = "adCf7 8jjd";
-
-
+#############Get Output Options
+commands_to_remove = "";
 
 ################ Input Validation
 boolreg =re.compile("^[0-1]$");
 numericreg =re.compile("^[0-9]$");
 alphanumericreg =re.compile("^([0-9]?[a-z]?[A-Z]?){1,20}$");
 
-save_username_match = re.search(boolreg, str(save_username))
-if not save_username_match:
-  print("save_username variable invalid. Change value in options.py.");
+remove_username_match = re.search(boolreg, str(remove_username))
+if not remove_username_match:
+  print("remove_username variable invalid. Change value in options.py.");
   sys.exit();
 
 use_hosts_header_match = re.search(boolreg, str(use_hosts_header))

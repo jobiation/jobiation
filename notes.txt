@@ -5,17 +5,13 @@ diffie-helman errors
 All devices must start with enable or not with enable
 You can specify the location of the password file in ansible.cfg, that way you don't have to include it in the bash file
 Do not do automation if you are not going to go through all the documentation
+Check character encoding and know what characters you can use. Best to keep it alphanumeric as you can.
 
 ALL:
-Make a hosts file and a hosts record file
-Allow them multiple hosts_header files
 Figure out how to make the text editor open the playbook and hosts file.
-P: Figure out what characters cannot be used in the csv file, hosts file, options file, etc.
-
 
 SEND COMMAND:
 Fact and when statements
-Give them the option to put in a restart
 
 
 GET OUTPUT:
@@ -29,3 +25,13 @@ In the get_output module, make a file called searches and allow them to specify 
 
 ACLs
 ACL group? - If they type manual, ask them the manual group name. Mark column?
+
+
+
+with open('notes.txt', 'r') as file1:
+    content = file1.read()
+match = re.search('(interface GigabitEthernet0/0/0(.*\n){1,3}ip address)(.*\n){1,6}interface GigabitEthernet0/0/1', content)
+if match:
+  print("match");
+else:
+  print("no match");

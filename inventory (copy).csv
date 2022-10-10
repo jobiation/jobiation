@@ -1,0 +1,4 @@
+devicename,active,ip,location,model,arg1,arg2,arg3,arg4,arg5,aclgrp,aclname,aclsub1,aclsub2,aclint1,aclint1dir,aclint2,aclint2dir,aclpostadd,aclpreadd,acllastcmd,dummycol
+skipline,active,ip,location,model,,,,,,,,,,,,,,,,,
+Jobiation1,1,192.168.254.226,field,C1111,50,10.18.255.150,1,,,aclgrp1,TunnelACL,10.1.1.0 0.0.0.31,,Tunnel 16,out,,,,,deny ip any any log,
+Myrouter2,1,10.1.1.2,field,C1111,6,10.18.255.101,0,,,aclgrp1,TunnelACL,10.1.1.0 0.0.0.31,,Tunnel 16,out,,,,,deny ip any any log,

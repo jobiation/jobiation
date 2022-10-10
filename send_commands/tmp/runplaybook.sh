@@ -1,2 +1,2 @@
 #!/bin/bash
-/usr/bin/ansible-playbook jobs/20221001_2107/jobiation_task.yaml -i jobs/20221001_2107/hosts -k > jobs/20221001_2107/playbook_result.txt
+/usr/bin/ansible-playbook --vault-id ansiblevaultuser@/var/cons/.ansiblecreds jobs/20221009_1945/ansible_task.yaml > jobs/20221009_1945/playbook_result.txt

@@ -26,8 +26,10 @@ current_dir = "jobs/" + date_time;
 
 # Check if username is needed in the options file
 if(options.use_hosts_header == 1):
-    print("Using hosts header");
-    shutil.copyfile("../common/hosts_header", "jobs/hosts");
+    if not os.path.exists("../hosts_header"):
+        input("You need to put a hosts_header file in the jobiation root when you set the use_hosts_header to 1 in options.py.");
+        sys.exit();
+    shutil.copyfile("../hosts_header", current_dir + "/hosts");
     username = "NA";
 elif(options.ansible_user == ""):
     username = input("You do not have a username set. What username do you want to use? ");
@@ -52,8 +54,7 @@ if(options.use_hosts_header == 0):
     hostsfile.write(" children:\n");
     hostsfile.write("   jobiation_inventory:\n");
     hostsfile.write("     hosts:\n");
-
-hostsfile.close();
+    hostsfile.close();
 
 # Open commands.txt and cache in variable commands_content
 with open('commands.txt', 'r') as commands_file:
@@ -204,9 +205,9 @@ tempfile.write("hostsfile.close();\n");
 tempfile.write("playbookfile.close();\n");
 tempfile.write("commandsfile.close();");
 
-os.chmod("tmp/tempfile.py", 0o770);
-
 tempfile.close();
+
+os.chmod("tmp/tempfile.py", 0o770);
 
 # Execute the the compiled file completefile.py
 exec(open("tmp/tempfile.py").read());
@@ -217,10 +218,30 @@ bashfile = open("tmp/runplaybook.sh","w");
 bashfile.write('#!/bin/bash\n');
 
 if(options.use_hosts_header == 1):
-    bashfile.write("/usr/bin/ansible-playbook --vault-id ansiblevaultuser@/var/cons/.ansiblecreds " + current_dir + "/ansible_task.yaml > " + current_dir + "/playbook_result.txt");
+    # bashfile.write("/usr/bin/ansible-playbook --vault-id ansiblevaultuser@/var/cons/.ansiblecreds " + current_dir + "/ansible_task.yaml > " + current_dir + "/playbook_result.txt");
+    bashfile.write("/usr/bin/ansible-playbook " + current_dir + "/jobiation_task.yaml -i " + current_dir + "/hosts > " + current_dir + "/playbook_result.txt");
 else:
     bashfile.write("/usr/bin/ansible-playbook " + current_dir + "/jobiation_task.yaml -i " + current_dir + "/hosts -k > " + current_dir + "/playbook_result.txt");
 bashfile.close();
 os.chmod("tmp/runplaybook.sh", 0o770);
 
-subprocess.call("tmp/runplaybook.sh")
+subprocess.call("tmp/runplaybook.sh");
+
+# # Remove username and password if desired
+with open(current_dir + "/hosts", "r") as hosts:
+    hostslines = hosts.readlines();
+with open(current_dir + "/hosts", "w") as hosts:
+    for hostsline in hostslines:
+        matchuser = re.search('ansible_user', hostsline)
+        matchpass = re.search('ansible_password', hostsline)
+        if matchuser and options.remove_username == 1:
+            print("\n\nRemoving username from hosts file.\n\n");
+        elif matchpass and options.remove_password == 1:
+            print("\n\nRemoving password from hosts file.\n\n");
+        else:
+            hosts.write(hostsline);
+
+# Remove the hosts_header file if desired
+if(options.remove_hosts_header == 1):
+    if os.path.exists("../hosts_header"):
+        os.remove("../hosts_header");
