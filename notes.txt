@@ -13,7 +13,6 @@ Figure out how to make the text editor open the playbook and hosts file.
 SEND COMMAND:
 Fact and when statements
 
-
 GET OUTPUT:
 Did you specify your search criteria?
 What column do you want to mark? (if not specified)
@@ -35,3 +34,16 @@ if match:
   print("match");
 else:
   print("no match");
+
+""" Stuff to go over.* means match anything
+^ and $
+\n
+| means or
+? means optional
+{n,m} means between n and m
+() group together
+literal strings
+\ is escape charater. Also tell them which characters they need to escape in literals
+r is raw string
+know what kind of line endings you have
+"""

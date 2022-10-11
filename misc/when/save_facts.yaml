@@ -1,0 +1,33 @@
+﻿---
+- name: Play to get the gathre facts content
+  hosts: jobiation_inventory
+  tasks:
+  - name: print ansible_facts
+    debug:
+     var: ansible_facts
+  - name: Copy ansible facts to a file.
+    copy:
+     content: "{{ ansible_facts.net_version }}"
+     dest: ansible_facts_details.json
+
+# ansible-galaxy collection install cisco.ios
+    #  var: ansible_facts["kernal"]
+
+########################Original Playbook
+
+# - name: Get_Output
+#   hosts: tempinventory
+#   gather_facts: yes
+#   connection: local
+#   vars:
+#     ansible_command_timeout: 30
+#   tasks:
+#   - name: run_show_command
+#     ios_command:
+#       commands: show run
+#     register: output
+#   - name: show_output
+#     debug:
+#       var: output.stdout
+#   - name: copy_output_to_file
+#     copy: content="{{ output.stdout[0] }}" dest="/var/ansiblerepo/playbooks/ansible_get_output/output/{{ inventory_hostname }}.txt"

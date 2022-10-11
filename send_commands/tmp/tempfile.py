@@ -3,10 +3,10 @@ import csv
 import sys
 import shutil
 import os
-hostsfile = open('jobs/20221009_1945/hosts', 'a+');
+hostsfile = open('jobs/20221010_1922/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
 commandsfile = open('commands.txt', 'r');
-playbookfile = open('jobs/20221009_1945/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20221010_1922/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 with inventoryfile as csvfile:
     datareader = csv.reader(csvfile)

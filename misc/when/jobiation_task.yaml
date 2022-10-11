@@ -1,0 +1,19 @@
+---
+- name: Jobiation1_pb
+  hosts: Jobiation1
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: print ansible_facts
+     debug:
+      var: ansible_facts
+   - name: Jobiation1_commands
+     when: "{{ ansible_facts.net_version }}" != "17.06.03a"
+     ios_command:
+      commands:
+       - config t
+       - end
+       - write
+
+###############################################################
