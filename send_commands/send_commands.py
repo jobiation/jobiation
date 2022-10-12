@@ -119,11 +119,25 @@ if(replacements_required == 0):
         tempfile.write("playbookfile.write('       answer:\\n');\n");
         tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
 
+    if options.when_condition != 0:
+        tempfile.write("playbookfile.write('   - name: Gather all legacy facts\\n');\n");
+        tempfile.write("playbookfile.write('     cisco.ios.ios_facts:\\n');\n");
+        tempfile.write("playbookfile.write('       gather_subset: all\\n');\n");
+        tempfile.write("playbookfile.write('     register: ios_facts\\n');\n");
+
+#   - name: Gather all legacy facts
+#     cisco.ios.ios_facts:
+#       gather_subset: all
+#     register: ios_facts_out
+
     tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
     tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
     tempfile.write("playbookfile.write('      commands:\\n');\n");
     tempfile.write("for cmd in commandsfile:\n");
     tempfile.write("    playbookfile.write('       - ' + cmd);\n");
+
+    if options.when_condition != 0:
+        tempfile.write("playbookfile.write('     when: ios_facts" + options.when_condition + "\\n');\n");
 
 tempfile.write("with inventoryfile as csvfile:\n");
 tempfile.write("    datareader = csv.reader(csvfile)\n");
@@ -182,6 +196,12 @@ if(replacements_required >= 1):
         tempfile.write("playbookfile.write('       answer:\\n');\n");
         tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
 
+    if options.when_condition != 0:
+        tempfile.write("        playbookfile.write('   - name: Gather all legacy facts\\n');\n");
+        tempfile.write("        playbookfile.write('     cisco.ios.ios_facts:\\n');\n");
+        tempfile.write("        playbookfile.write('       gather_subset: all\\n');\n");
+        tempfile.write("        playbookfile.write('     register: ios_facts\\n');\n");
+
     tempfile.write("        playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
     tempfile.write("        playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
     tempfile.write("        playbookfile.write('      commands:\\n');\n");
@@ -195,6 +215,10 @@ if(replacements_required >= 1):
         tempfile.write("            repstr = repstr.replace('!"+replacement+"', "+replacement+");\n");
 
     tempfile.write("            playbookfile.write('       - ' + repstr);\n");
+
+    if options.when_condition != 0:
+        tempfile.write("        playbookfile.write('     when: ios_facts" + options.when_condition + "\\n');\n");
+
     tempfile.write("        playbookfile.write('\\n###############################################################\\n');\n");
 
 # Add commands to tempfile.py to close all files.

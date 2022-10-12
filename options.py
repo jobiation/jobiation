@@ -20,7 +20,7 @@ connection = "local";
 cisco_product_line = "ios_command";
 
 # Send command options
-add_when_condition = 0;
+when_condition = '["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00"';
 reload_in = -1; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
 
 #############Get Output Options

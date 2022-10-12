@@ -3,10 +3,10 @@ import csv
 import sys
 import shutil
 import os
-hostsfile = open('jobs/20221010_1922/hosts', 'a+');
+hostsfile = open('jobs/20221011_2038/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
 commandsfile = open('commands.txt', 'r');
-playbookfile = open('jobs/20221010_1922/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20221011_2038/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 with inventoryfile as csvfile:
     datareader = csv.reader(csvfile)
@@ -14,8 +14,8 @@ with inventoryfile as csvfile:
         devicename = row[0];
         active = row[1];
         ip = row[2];
+        arg2 = row[6];
         arg3 = row[7];
-        arg4 = row[8];
 # Note that 'continue' means skip.
 # Conditions must be casted as strings
 # Conditions form a logical AND
@@ -39,14 +39,19 @@ with inventoryfile as csvfile:
         playbookfile.write('  vars:\n');
         playbookfile.write('   ansible_command_timeout: 30\n');
         playbookfile.write('  tasks:\n');
+        playbookfile.write('   - name: Gather all legacy facts\n');
+        playbookfile.write('     cisco.ios.ios_facts:\n');
+        playbookfile.write('       gather_subset: all\n');
+        playbookfile.write('     register: ios_facts\n');
         playbookfile.write('   - name: ' + devicename + '_commands\n');
         playbookfile.write('     ios_command:\n');
         playbookfile.write('      commands:\n');
         commandsfile = open('commands.txt', 'r');
         for cmd in commandsfile:
             repstr = cmd;
-            repstr = repstr.replace('!arg4', arg4);
+            repstr = repstr.replace('!arg2', arg2);
             playbookfile.write('       - ' + repstr);
+        playbookfile.write('     when: ios_facts["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00"\n');
         playbookfile.write('\n###############################################################\n');
 
 inventoryfile.close();
