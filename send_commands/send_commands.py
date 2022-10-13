@@ -125,11 +125,6 @@ if(replacements_required == 0):
         tempfile.write("playbookfile.write('       gather_subset: all\\n');\n");
         tempfile.write("playbookfile.write('     register: ios_facts\\n');\n");
 
-#   - name: Gather all legacy facts
-#     cisco.ios.ios_facts:
-#       gather_subset: all
-#     register: ios_facts_out
-
     tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
     tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
     tempfile.write("playbookfile.write('      commands:\\n');\n");

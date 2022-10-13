@@ -1,4 +1,4 @@
 config t
-command !arg2
+hostname Jobiation1
 end
 write

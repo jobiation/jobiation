@@ -6,6 +6,7 @@ All devices must start with enable or not with enable
 You can specify the location of the password file in ansible.cfg, that way you don't have to include it in the bash file
 Do not do automation if you are not going to go through all the documentation
 Check character encoding and know what characters you can use. Best to keep it alphanumeric as you can.
+ctrl + shift + i in VS code displays JSON prettier
 
 ALL:
 Figure out how to make the text editor open the playbook and hosts file.

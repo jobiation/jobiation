@@ -6,7 +6,6 @@ all:
   ansible_network_os: ios
   ansible_port: 22
   ansible_user: jobiation
-  ansible_password: Jobiation01!
  children:
    jobiation_inventory:
      hosts:

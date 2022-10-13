@@ -1,0 +1,19 @@
+---
+- name: jobiation_pb
+  hosts: jobiation_inventory
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Gather all legacy facts
+     cisco.ios.ios_facts:
+       gather_subset: all
+     register: ios_facts
+   - name: jobiation_commands
+     ios_command:
+      commands:
+       - config t
+       - hostname itdoesntwork
+       - end
+       - write
+     when: ios_facts["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc01"

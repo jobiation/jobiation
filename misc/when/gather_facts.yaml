@@ -1,35 +1,38 @@
 ﻿---
 - name: Get_Output
-  hosts: tempinventory
-  gather_facts: yes
+  hosts: jobiation_inventory
+  gather_facts: no
   connection: local
   vars:
     ansible_command_timeout: 30
   tasks:
-  - name: Gather all legacy facts
-    cisco.ios.ios_facts:
-      gather_subset: all
-    register: ios_facts_out
-  - name: copy_output_to_file
-    # copy: content="{{ ios_facts_out|json_query('ansible_facts') }}" dest="facts.json"
-    copy: content="{{ ios_facts_out['ansible_facts']['ansible_net_interfaces']['GigabitEthernet0/0/0']['macaddress'] }}" dest="{{ inventory_hostname }}.txt"
-    # copy: content="{{ ios_facts_out|json_query('ansible_facts.ansible_net_version') }}" dest="{{ inventory_hostname }}.txt"
-  - name: 
-    ios_command:
+  - name: run_show_command
+    cisco.ios.ios_command:
+      commands: show run
+    register: showrun
+  - name: run_ios_commands
+    cisco.ios.ios_command:
       commands:
         - config t
-        - interface loopback 10
-        - ip address 10.18.203.55 255.255.255.255
+        - no interface loopback 10
         - end
         - write
-    when: ios_facts_out['ansible_facts']['ansible_net_interfaces']['GigabitEthernet0/0/0']['macaddress'] == "2436.daf2.dc00"
+    when: showrun is search("10.18.203.55")
 
-  # - name: run_show_command
-  #   ios_command:
-  #     commands: show run
-  #   register: output
-  # - name: show_output
-  #   debug:
-  #     var: output.stdout
+  # - name: Gather all legacy facts
+  #   cisco.ios.ios_facts:
+  #     gather_subset: all
+  #   register: ios_facts_out
   # - name: copy_output_to_file
-  #   copy: content="{{ output.stdout[0] }}" dest="/var/ansiblerepo/playbooks/ansible_get_output/output/{{ inventory_hostname }}.txt"
+  #   #copy: content="{{ ios_facts_out|json_query('ansible_facts') }}" dest="facts.json"
+  #   copy: content="{{ ios_facts_out['ansible_facts']['ansible_net_filesystems_info']['bootflash:']['spacefree_kb'] }}" dest="{{ inventory_hostname }}.json"
+
+  # - name: 
+  #   ios_command:
+  #     commands:
+  #       - config t
+  #       - interface loopback 10
+  #       - ip address 10.18.203.55 255.255.255.255
+  #       - end
+  #       - write
+  #   when: ios_facts_out['ansible_facts']['ansible_net_interfaces']['GigabitEthernet0/0/0']['macaddress'] == "2436.daf2.dc00"

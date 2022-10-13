@@ -1,0 +1,1 @@
+{"bootflash:": {"spacetotal_kb": 2921696.0, "spacefree_kb": 1539472.0}}

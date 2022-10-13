@@ -9,8 +9,8 @@ ansible_network_os = "ios";
 ansible_port = "22";
 ansible_user = "jobiation";
 use_hosts_header = 0;
-remove_hosts_header = 1;
-remove_username = 1;
+remove_hosts_header = 0;
+remove_username = 0;
 remove_password = 1;
 
 # Playbook header options
