@@ -6,33 +6,29 @@
   vars:
     ansible_command_timeout: 30
   tasks:
+# #################when show command#####################
   - name: run_show_command
     cisco.ios.ios_command:
       commands: show run
-    register: showrun
-  - name: run_ios_commands
-    cisco.ios.ios_command:
-      commands:
-        - config t
-        - no interface loopback 10
-        - end
-        - write
-    when: showrun is search("10.18.203.55")
+    register: showcmdoutput
+  - name: copy_cmd_output_to_file
+    copy: content="{{ showcmdoutput.stdout[0] }}" dest="{{ inventory_hostname }}.txt"
+#   - name: run_ios_commands
+#     cisco.ios.ios_command:
+#       commands:
+#         - config t
+#         - end
+#     when: showcmdoutput is search("10.18.203.55")
 
-  # - name: Gather all legacy facts
+  # ###################when facts################3
+  # - name: gather_facts
   #   cisco.ios.ios_facts:
-  #     gather_subset: all
-  #   register: ios_facts_out
+  #   register: ios_facts
   # - name: copy_output_to_file
-  #   #copy: content="{{ ios_facts_out|json_query('ansible_facts') }}" dest="facts.json"
-  #   copy: content="{{ ios_facts_out['ansible_facts']['ansible_net_filesystems_info']['bootflash:']['spacefree_kb'] }}" dest="{{ inventory_hostname }}.json"
-
-  # - name: 
-  #   ios_command:
+  #   copy: content="{{ ios_facts }}" dest="{{ inventory_hostname }}.json"
+  # - name: run_ios_commands
+  #   cisco.ios.ios_command:
   #     commands:
   #       - config t
-  #       - interface loopback 10
-  #       - ip address 10.18.203.55 255.255.255.255
   #       - end
-  #       - write
-  #   when: ios_facts_out['ansible_facts']['ansible_net_interfaces']['GigabitEthernet0/0/0']['macaddress'] == "2436.daf2.dc00"
+  #   when: ios_facts['ansible_facts']['ansible_net_filesystems_info']['bootflash:']['spacefree_kb'] >= 1537809

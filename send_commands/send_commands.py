@@ -9,6 +9,8 @@ from datetime import datetime
 import subprocess # For running a bash script
 import re
 
+spaces = "        ";
+
 # Make array of required columns
 req_columns = [ "devicename", "ip", "active" ];
 
@@ -119,11 +121,16 @@ if(replacements_required == 0):
         tempfile.write("playbookfile.write('       answer:\\n');\n");
         tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
 
-    if options.when_condition != 0:
-        tempfile.write("playbookfile.write('   - name: Gather all legacy facts\\n');\n");
-        tempfile.write("playbookfile.write('     cisco.ios.ios_facts:\\n');\n");
-        tempfile.write("playbookfile.write('       gather_subset: all\\n');\n");
-        tempfile.write("playbookfile.write('     register: ios_facts\\n');\n");
+    if options.facts_when_enable == 1:
+        tempfile.write("playbookfile.write('   - name: gather_facts\\n');\n");
+        tempfile.write("playbookfile.write('     " + options.facts_module + ":\\n');\n");
+        tempfile.write("playbookfile.write('     register: jobiation_facts\\n');\n");
+
+    if options.showcmd_when_enable == 1:
+        tempfile.write("playbookfile.write('   - name: run_show_command\\n');\n");
+        tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+        tempfile.write("playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
+        tempfile.write("playbookfile.write('     register: jobiation_showcmd\\n');\n");
 
     tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
     tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
@@ -131,8 +138,13 @@ if(replacements_required == 0):
     tempfile.write("for cmd in commandsfile:\n");
     tempfile.write("    playbookfile.write('       - ' + cmd);\n");
 
-    if options.when_condition != 0:
-        tempfile.write("playbookfile.write('     when: ios_facts" + options.when_condition + "\\n');\n");
+    tempfile.write("playbookfile.write('\\n');\n");
+
+    if options.facts_when_enable == 1:
+        tempfile.write("playbookfile.write('     when: jobiation_facts" + options.facts_when_condition + "\\n');\n");
+
+    if options.showcmd_when_enable == 1:
+        tempfile.write("playbookfile.write('     when: jobiation_showcmd is search(\"" + options.showcmd_search_string + "\")\\n');\n");
 
 tempfile.write("with inventoryfile as csvfile:\n");
 tempfile.write("    datareader = csv.reader(csvfile)\n");
@@ -179,23 +191,28 @@ if(replacements_required >= 1):
 
     # Add write and reload if desired
     if options.reload_in >= 1:
-        tempfile.write("playbookfile.write('   - name: Write\\n');\n");
-        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
-        tempfile.write("playbookfile.write('       command: \"write\"\\n');\n");
-        tempfile.write("playbookfile.write('   - name: Reload\\n');\n");
-        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
-        tempfile.write("playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
-        tempfile.write("playbookfile.write('       check_all: True\\n');\n");
-        tempfile.write("playbookfile.write('       prompt:\\n');\n");
-        tempfile.write("playbookfile.write('         - \"Confirm\"\\n');\n");
-        tempfile.write("playbookfile.write('       answer:\\n');\n");
-        tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('   - name: Write\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('       command: \"write\"\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('   - name: Reload\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('       check_all: True\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('       prompt:\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('         - \"Confirm\"\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('       answer:\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('         - \"y\"\\n');\n");
 
-    if options.when_condition != 0:
-        tempfile.write("        playbookfile.write('   - name: Gather all legacy facts\\n');\n");
-        tempfile.write("        playbookfile.write('     cisco.ios.ios_facts:\\n');\n");
-        tempfile.write("        playbookfile.write('       gather_subset: all\\n');\n");
-        tempfile.write("        playbookfile.write('     register: ios_facts\\n');\n");
+    if options.facts_when_enable == 1:
+        tempfile.write(spaces + "playbookfile.write('   - name: gather_facts\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('     " + options.facts_module + ":\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('     register: jobiation_facts\\n');\n");
+
+    if options.showcmd_when_enable == 1:
+        tempfile.write(spaces + "playbookfile.write('   - name: run_show_command\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
+        tempfile.write(spaces + "playbookfile.write('     register: jobiation_showcmd\\n');\n");
 
     tempfile.write("        playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
     tempfile.write("        playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
@@ -211,8 +228,13 @@ if(replacements_required >= 1):
 
     tempfile.write("            playbookfile.write('       - ' + repstr);\n");
 
-    if options.when_condition != 0:
-        tempfile.write("        playbookfile.write('     when: ios_facts" + options.when_condition + "\\n');\n");
+    tempfile.write(spaces + "playbookfile.write('\\n');\n");
+
+    if options.facts_when_enable == 1:
+        tempfile.write(spaces + "playbookfile.write('     when: jobiation_facts" + options.facts_when_condition + "\\n');\n");
+
+    if options.showcmd_when_enable == 1:
+        tempfile.write(spaces + "playbookfile.write('     when: jobiation_showcmd is search(\"" + options.showcmd_search_string + "\")\\n');\n");
 
     tempfile.write("        playbookfile.write('\\n###############################################################\\n');\n");
 

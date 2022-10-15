@@ -17,10 +17,18 @@ remove_password = 1;
 gather_facts = "no";
 ansible_command_timeout = "30";
 connection = "local";
-cisco_product_line = "ios_command";
+cisco_product_line = "cisco.ios.ios_command";
 
 # Send command options
-when_condition = '["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00"';
+facts_when_enable = 1;
+facts_module = "cisco.ios.ios_facts";
+facts_when_condition = '["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00"';
+
+showcmd_when_enable = 1;
+showcmd = "show running-config";
+showcmd_search_string = "string for which you want to search in the showcmd output.";
+
+copy_file = 0;
 reload_in = -1; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
 
 #############Get Output Options

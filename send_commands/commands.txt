@@ -1,4 +1,3 @@
 config t
-hostname Jobiation1
+!arg2
 end
-write
