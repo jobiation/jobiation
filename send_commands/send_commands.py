@@ -121,12 +121,12 @@ if(replacements_required == 0):
         tempfile.write("playbookfile.write('       answer:\\n');\n");
         tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
 
-    if options.facts_when_enable == 1:
+    if options.save_facts == 1:
         tempfile.write("playbookfile.write('   - name: gather_facts\\n');\n");
         tempfile.write("playbookfile.write('     " + options.facts_module + ":\\n');\n");
         tempfile.write("playbookfile.write('     register: jobiation_facts\\n');\n");
 
-    if options.showcmd_when_enable == 1:
+    if options.save_showcmd == 1:
         tempfile.write("playbookfile.write('   - name: run_show_command\\n');\n");
         tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
         tempfile.write("playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
@@ -140,11 +140,8 @@ if(replacements_required == 0):
 
     tempfile.write("playbookfile.write('\\n');\n");
 
-    if options.facts_when_enable == 1:
-        tempfile.write("playbookfile.write('     when: jobiation_facts" + options.facts_when_condition + "\\n');\n");
-
-    if options.showcmd_when_enable == 1:
-        tempfile.write("playbookfile.write('     when: jobiation_showcmd is search(\"" + options.showcmd_search_string + "\")\\n');\n");
+    if options.when_enable == 1:
+        tempfile.write("playbookfile.write('     when: " + options.when_condition + "\\n');\n");
 
 tempfile.write("with inventoryfile as csvfile:\n");
 tempfile.write("    datareader = csv.reader(csvfile)\n");
@@ -203,12 +200,12 @@ if(replacements_required >= 1):
         tempfile.write(spaces + "playbookfile.write('       answer:\\n');\n");
         tempfile.write(spaces + "playbookfile.write('         - \"y\"\\n');\n");
 
-    if options.facts_when_enable == 1:
+    if options.save_facts == 1:
         tempfile.write(spaces + "playbookfile.write('   - name: gather_facts\\n');\n");
         tempfile.write(spaces + "playbookfile.write('     " + options.facts_module + ":\\n');\n");
         tempfile.write(spaces + "playbookfile.write('     register: jobiation_facts\\n');\n");
 
-    if options.showcmd_when_enable == 1:
+    if options.save_showcmd == 1:
         tempfile.write(spaces + "playbookfile.write('   - name: run_show_command\\n');\n");
         tempfile.write(spaces + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
         tempfile.write(spaces + "playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
@@ -230,11 +227,8 @@ if(replacements_required >= 1):
 
     tempfile.write(spaces + "playbookfile.write('\\n');\n");
 
-    if options.facts_when_enable == 1:
-        tempfile.write(spaces + "playbookfile.write('     when: jobiation_facts" + options.facts_when_condition + "\\n');\n");
-
-    if options.showcmd_when_enable == 1:
-        tempfile.write(spaces + "playbookfile.write('     when: jobiation_showcmd is search(\"" + options.showcmd_search_string + "\")\\n');\n");
+    if options.when_enable == 1:
+        tempfile.write(spaces + "playbookfile.write('     when: " + options.when_condition + "\\n');\n");
 
     tempfile.write("        playbookfile.write('\\n###############################################################\\n');\n");
 

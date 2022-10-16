@@ -1,0 +1,10 @@
+---
+all:
+ vars:
+  ansible_python_interpreter: /usr/bin/python3
+  ansible_connection: network_cli
+  ansible_network_os: ios
+  ansible_port: 22
+  ansible_user: jobiation
+  ansible_pass: Jobiation01!
+ children:
