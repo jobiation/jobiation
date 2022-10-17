@@ -12,8 +12,6 @@ ALL:
 Figure out how to make the text editor open the playbook and hosts file.
 
 SEND COMMAND:
-Fact and when statements
-Validate the first line of the inventory
 
 GET OUTPUT:
 Did you specify your search criteria?
@@ -90,3 +88,10 @@ know what kind of line endings you have
   #       - config t
   #       - end
   #   when: ios_facts['ansible_facts']['ansible_net_filesystems_info']['bootflash:']['spacefree_kb'] >= 1537809
+
+#################################Try Except##################################33
+try:
+    options.save_facts2
+    print("variable exists")
+except:
+    print("Variable does not exist.")

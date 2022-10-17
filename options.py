@@ -2,13 +2,13 @@
 import re
 import sys
 
-# Hosts header options
+# Hosts file options
 ansible_python_interpreter = "/usr/bin/python3";
 ansible_connection = "network_cli";
 ansible_network_os = "ios";
 ansible_port = "22";
 ansible_user = "jobiation";
-use_hosts_header = 0;
+use_hosts_header = 1;
 remove_hosts_header = 0;
 remove_username = 0;
 remove_password = 0;
@@ -16,20 +16,20 @@ remove_password = 0;
 # Playbook header options
 gather_facts = "no";
 ansible_command_timeout = "30";
-connection = "local";
+# connection = "local";
 cisco_product_line = "cisco.ios.ios_command";
 
 # Send command options
-save_facts = 1;
+save_facts = 0;
 facts_module = "cisco.ios.ios_facts";
 
-save_showcmd = 1;
+save_showcmd = 0;
 showcmd = "show running-config";
 
-when_enable = 1;
+when_enable = 0;
 when_condition = 'jobiation_facts["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and jobiation_showcmd is search("ip name-server 192.168.254.254")';
 
-reload_in = -1; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
+reload_in = 0; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
 
 #############Get Output Options
 commands_to_remove = "";

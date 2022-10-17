@@ -9,7 +9,7 @@ from datetime import datetime
 import subprocess # For running a bash script
 import re
 
-spaces = "        ";
+spaces8 = "        ";
 
 # Make array of required columns
 req_columns = [ "devicename", "ip", "active" ];
@@ -26,6 +26,9 @@ date_time = now.strftime("%Y%m%d_%H%M");
 os.mkdir('jobs/' + date_time);
 current_dir = "jobs/" + date_time;
 
+# Declare password_prompt variable and overwrite if using hosts_header file
+password_prompt = " -k";
+
 # Check if username is needed in the options file
 if(options.use_hosts_header == 1):
     if not os.path.exists("../hosts_header"):
@@ -33,6 +36,7 @@ if(options.use_hosts_header == 1):
         sys.exit();
     shutil.copyfile("../hosts_header", current_dir + "/hosts");
     username = "NA";
+    password_prompt = "";
 elif(options.ansible_user == ""):
     username = input("You do not have a username set. What username do you want to use? ");
 else:
@@ -40,23 +44,7 @@ else:
 
 # Ask user if they want to do a write and reload
 if options.reload_in >= 1:
-    confirm = input("ATTENTION! You have the reload_1 option set to a non-zero value. Press enter to continue only if you understand your devices will be reloaded in " + str(options.reload_in) + " minutes.");
-
-# Build Hosts header if use_hosts_headeer == 0
-if(options.use_hosts_header == 0):
-    hostsfile = open(current_dir+"/hosts","w");
-    hostsfile.write("---\n");
-    hostsfile.write("all:\n");   
-    hostsfile.write(" vars:\n");
-    hostsfile.write("  ansible_python_interpreter: " + options.ansible_python_interpreter + "\n");
-    hostsfile.write("  ansible_connection: " + options.ansible_connection + "\n");
-    hostsfile.write("  ansible_network_os: " + options.ansible_network_os + "\n");
-    hostsfile.write("  ansible_port: " + options.ansible_port + "\n");
-    hostsfile.write("  ansible_user: " + username + "\n");
-    hostsfile.write(" children:\n");
-    hostsfile.write("   jobiation_inventory:\n");
-    hostsfile.write("     hosts:\n");
-    hostsfile.close();
+    confirm = input("ATTENTION! You have the reload_in option set to a non-zero value. Press enter to continue only if you understand your devices will be reloaded in " + str(options.reload_in) + " minutes.");
 
 # Open commands.txt and cache in variable commands_content
 with open('commands.txt', 'r') as commands_file:
@@ -76,10 +64,30 @@ inventoryfile.close();
 # Make variable for replacements
 replacements_required = 0;
 
-# Increment replacements_required variable
+# Increment replacements_required variable and validate the first line.
+flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
 for flCol in range(len(flList)-1):
     if re.search("!"+flList[flCol], commands_content):
         replacements_required = replacements_required+1;
+    if not re.search(flAllowedChars, str(flList[flCol])):
+        print(flList[flCol] + " contains an illegal character.\nThe top line of the inventory can contain numbers, letters, and underscores.\nAlso, please do not use more than 15 characters in any one column header.");
+        sys.exit();
+
+# Build Hosts header if use_hosts_header == 0
+if(options.use_hosts_header == 0):
+    hostsfile = open(current_dir+"/hosts","w");
+    hostsfile.write("---\n");
+    hostsfile.write("all:\n");   
+    hostsfile.write(" vars:\n");
+    hostsfile.write("  ansible_python_interpreter: " + options.ansible_python_interpreter + "\n");
+    hostsfile.write("  ansible_connection: " + options.ansible_connection + "\n");
+    hostsfile.write("  ansible_network_os: " + options.ansible_network_os + "\n");
+    hostsfile.write("  ansible_port: " + options.ansible_port + "\n");
+    hostsfile.write("  ansible_user: " + username + "\n");
+    hostsfile.write(" children:\n");
+    hostsfile.write("   jobiation_inventory:\n");
+    hostsfile.write("     hosts:\n");
+    hostsfile.close();
 
 # Make temp python file
 tempfile = open("tmp/tempfile.py","w");
@@ -174,63 +182,63 @@ for name in filenames:
             tempfile.write(line)
 
 # Add commands for hosts file to tempfile.py
-tempfile.write("        hostsfile.write('       ' + devicename + ':\\n');\n");
-tempfile.write("        hostsfile.write('         ansible_host: ' + ip + '\\n');\n");
+tempfile.write(spaces8 + "hostsfile.write('       ' + devicename + ':\\n');\n");
+tempfile.write(spaces8 + "hostsfile.write('         ansible_host: ' + ip + '\\n');\n");
 
 # Add commands for playbook file to tempfile.py
 if(replacements_required >= 1):
-    tempfile.write("        playbookfile.write('- name: ' + devicename + '_pb\\n');\n");
-    tempfile.write("        playbookfile.write('  hosts: ' + devicename + '\\n');\n");
-    tempfile.write("        playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
-    tempfile.write("        playbookfile.write('  vars:\\n');\n");
-    tempfile.write("        playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
-    tempfile.write("        playbookfile.write('  tasks:\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('- name: ' + devicename + '_pb\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  hosts: ' + devicename + '\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  vars:\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  tasks:\\n');\n");
 
     # Add write and reload if desired
     if options.reload_in >= 1:
-        tempfile.write(spaces + "playbookfile.write('   - name: Write\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('     cli_command:\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       command: \"write\"\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('   - name: Reload\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('     cli_command:\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       check_all: True\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       prompt:\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('         - \"Confirm\"\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       answer:\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('         - \"y\"\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('   - name: Write\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       command: \"write\"\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('   - name: Reload\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       check_all: True\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       prompt:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('         - \"Confirm\"\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       answer:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('         - \"y\"\\n');\n");
 
     if options.save_facts == 1:
-        tempfile.write(spaces + "playbookfile.write('   - name: gather_facts\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('     " + options.facts_module + ":\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('     register: jobiation_facts\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('   - name: gather_facts\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     " + options.facts_module + ":\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     register: jobiation_facts\\n');\n");
 
     if options.save_showcmd == 1:
-        tempfile.write(spaces + "playbookfile.write('   - name: run_show_command\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('     register: jobiation_showcmd\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('   - name: run_show_command\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     register: jobiation_showcmd\\n');\n");
 
-    tempfile.write("        playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
-    tempfile.write("        playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
-    tempfile.write("        playbookfile.write('      commands:\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('      commands:\\n');\n");
 
     # Add commands for variable replacement
-    tempfile.write("        commandsfile = open('commands.txt', 'r');\n");
-    tempfile.write("        for cmd in commandsfile:\n");
-    tempfile.write("            repstr = cmd;\n");
+    tempfile.write(spaces8 + "commandsfile = open('commands.txt', 'r');\n");
+    tempfile.write(spaces8 + "for cmd in commandsfile:\n");
+    tempfile.write(spaces8 + "    repstr = cmd;\n");
 
     for replacement in vars_used:
-        tempfile.write("            repstr = repstr.replace('!"+replacement+"', "+replacement+");\n");
+        tempfile.write(spaces8 + "    repstr = repstr.replace('!"+replacement+"', "+replacement+");\n");
 
-    tempfile.write("            playbookfile.write('       - ' + repstr);\n");
+    tempfile.write(spaces8 + "    playbookfile.write('       - ' + repstr);\n");
 
-    tempfile.write(spaces + "playbookfile.write('\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('\\n');\n");
 
     if options.when_enable == 1:
-        tempfile.write(spaces + "playbookfile.write('     when: " + options.when_condition + "\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     when: " + options.when_condition + "\\n');\n");
 
-    tempfile.write("        playbookfile.write('\\n###############################################################\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('\\n###############################################################\\n');\n");
 
 # Add commands to tempfile.py to close all files.
 
@@ -252,11 +260,7 @@ confirm = input("Your playbook and hosts file is ready. Please open them in " + 
 bashfile = open("tmp/runplaybook.sh","w");
 bashfile.write('#!/bin/bash\n');
 
-if(options.use_hosts_header == 1):
-    # bashfile.write("/usr/bin/ansible-playbook --vault-id ansiblevaultuser@/var/cons/.ansiblecreds " + current_dir + "/ansible_task.yaml > " + current_dir + "/playbook_result.txt");
-    bashfile.write("/usr/bin/ansible-playbook " + current_dir + "/jobiation_task.yaml -i " + current_dir + "/hosts > " + current_dir + "/playbook_result.txt");
-else:
-    bashfile.write("/usr/bin/ansible-playbook " + current_dir + "/jobiation_task.yaml -i " + current_dir + "/hosts -k > " + current_dir + "/playbook_result.txt");
+bashfile.write("/usr/bin/ansible-playbook " + current_dir + "/jobiation_task.yaml -i " + current_dir + "/hosts" + password_prompt + " > " + current_dir + "/playbook_result.txt");
 bashfile.close();
 os.chmod("tmp/runplaybook.sh", 0o770);
 
