@@ -1,5 +1,0 @@
-config t
-interface loopback !arg1
-ip address !arg2 255.255.255.255
-end
-write

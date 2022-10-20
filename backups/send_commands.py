@@ -9,15 +9,15 @@ from datetime import datetime
 import subprocess # For running a bash script
 import re
 
+# Make spaces variable
+spaces8 = "        ";
+
 # Make array of required columns
 req_columns = [ "devicename", "ip", "active" ];
 
 # Import options file
 sys.path.insert(1, '../');
 import options
-
-# Import send_command_functions
-import scfunctions
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -76,12 +76,6 @@ for flCol in range(len(flList)-1):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
         sys.exit();
 
-# Make spaces variable
-if replacements_required == 0:
-    spaces = "";
-else:
-    spaces = "        ";
-
 # Build Hosts header if use_hosts_header == 0
 if(options.use_hosts_header == 0):
     hostsfile = open(current_dir+"/hosts","w");
@@ -126,15 +120,30 @@ if(replacements_required == 0):
 
     # Add write and reload if desired
     if options.reload_in >= 1:
-        scfunctions.reloadIn(tempfile,options.reload_in,spaces);
+        tempfile.write("playbookfile.write('   - name: Write\\n');\n");
+        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write("playbookfile.write('       command: \"write\"\\n');\n");
+        tempfile.write("playbookfile.write('   - name: Reload\\n');\n");
+        tempfile.write("playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write("playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
+        tempfile.write("playbookfile.write('       check_all: True\\n');\n");
+        tempfile.write("playbookfile.write('       prompt:\\n');\n");
+        tempfile.write("playbookfile.write('         - \"Confirm\"\\n');\n");
+        tempfile.write("playbookfile.write('       answer:\\n');\n");
+        tempfile.write("playbookfile.write('         - \"y\"\\n');\n");
 
     # Save facts if desired
     if options.save_facts == 1:
-        scfunctions.saveFacts(tempfile,options.facts_module,spaces);
+        tempfile.write("playbookfile.write('   - name: gather_facts\\n');\n");
+        tempfile.write("playbookfile.write('     " + options.facts_module + ":\\n');\n");
+        tempfile.write("playbookfile.write('     register: jobiation_facts\\n');\n");
 
     # save output from show command if desired.
     if options.save_showcmd == 1:
-        scfunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd,spaces);
+        tempfile.write("playbookfile.write('   - name: run_show_command\\n');\n");
+        tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+        tempfile.write("playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
+        tempfile.write("playbookfile.write('     register: jobiation_showcmd\\n');\n");
 
     # Write commands
     tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
@@ -179,52 +188,67 @@ for name in filenames:
             tempfile.write(line)
 
 # Add commands for hosts file to tempfile.py
-tempfile.write(spaces + "hostsfile.write('       ' + devicename + ':\\n');\n");
-tempfile.write(spaces + "hostsfile.write('         ansible_host: ' + ip + '\\n');\n");
+tempfile.write(spaces8 + "hostsfile.write('       ' + devicename + ':\\n');\n");
+tempfile.write(spaces8 + "hostsfile.write('         ansible_host: ' + ip + '\\n');\n");
 
 # Add commands for playbook file to tempfile.py
 if(replacements_required >= 1):
-    tempfile.write(spaces + "playbookfile.write('- name: ' + devicename + '_pb\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  hosts: ' + devicename + '\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  vars:\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('- name: ' + devicename + '_pb\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  hosts: ' + devicename + '\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  vars:\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('  tasks:\\n');\n");
 
     # Add write and reload if desired
     if options.reload_in >= 1:
-        scfunctions.reloadIn(tempfile,options.reload_in,spaces);
+        tempfile.write(spaces8 + "playbookfile.write('   - name: Write\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       command: \"write\"\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('   - name: Reload\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     cli_command:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       command: \"reload in " + str(options.reload_in) + "\"\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       check_all: True\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       prompt:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('         - \"Confirm\"\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       answer:\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('         - \"y\"\\n');\n");
 
     # Save facts if desired
     if options.save_facts == 1:
-        scfunctions.saveFacts(tempfile,options.facts_module,spaces);
+        tempfile.write(spaces8 + "playbookfile.write('   - name: gather_facts\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     " + options.facts_module + ":\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     register: jobiation_facts\\n');\n");
 
     # Save output from show command if desired.
     if options.save_showcmd == 1:
-        scfunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd,spaces);
+        tempfile.write(spaces8 + "playbookfile.write('   - name: run_show_command\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('       commands: " + options.showcmd + "\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     register: jobiation_showcmd\\n');\n");
 
     # Add commands to tempfile.py
-    tempfile.write(spaces + "playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('      commands:\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('      commands:\\n');\n");
 
     # Add commands for variable replacement
-    tempfile.write(spaces + "commandsfile = open('commands.txt', 'r');\n");
-    tempfile.write(spaces + "for cmd in commandsfile:\n");
-    tempfile.write(spaces + "    repstr = cmd;\n");
+    tempfile.write(spaces8 + "commandsfile = open('commands.txt', 'r');\n");
+    tempfile.write(spaces8 + "for cmd in commandsfile:\n");
+    tempfile.write(spaces8 + "    repstr = cmd;\n");
 
     # Make replacements
     for replacement in vars_used:
-        tempfile.write(spaces + "    repstr = repstr.replace('!"+replacement+"', "+replacement+");\n");
-    tempfile.write(spaces + "    playbookfile.write('       - ' + repstr);\n");
-    tempfile.write(spaces + "playbookfile.write('\\n');\n");
+        tempfile.write(spaces8 + "    repstr = repstr.replace('!"+replacement+"', "+replacement+");\n");
+    tempfile.write(spaces8 + "    playbookfile.write('       - ' + repstr);\n");
+    tempfile.write(spaces8 + "playbookfile.write('\\n');\n");
 
     # Add when condition if desired
     if options.when_enable == 1:
-        tempfile.write(spaces + "playbookfile.write('     when: " + options.when_condition + "\\n');\n");
+        tempfile.write(spaces8 + "playbookfile.write('     when: " + options.when_condition + "\\n');\n");
 
     # Make line between devices for easier reading.
-    tempfile.write(spaces + "playbookfile.write('\\n###############################################################\\n');\n");
+    tempfile.write(spaces8 + "playbookfile.write('\\n###############################################################\\n');\n");
 
 # Add commands to tempfile.py to close all files.
 tempfile.write("\n");
