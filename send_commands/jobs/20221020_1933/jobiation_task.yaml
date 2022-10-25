@@ -1,0 +1,67 @@
+---
+- name: Jobiation1_pb
+  hosts: Jobiation1
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Write
+     cli_command:
+       command: "write"
+   - name: Reload
+     cli_command:
+       command: "reload in 1"
+       check_all: True
+       prompt:
+         - "Confirm"
+       answer:
+         - "y"
+   - name: gather_facts
+     cisco.ios.ios_facts:
+     register: jobiation_facts
+   - name: run_show_command
+     cisco.ios.ios_command:
+       commands: show running-config
+     register: jobiation_showcmd
+   - name: Jobiation1_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - interface loopback 54
+       - end
+     when: jobiation_facts["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and jobiation_showcmd is search("ip name-server 192.168.254.254")
+
+###############################################################
+- name: Myrouter2_pb
+  hosts: Myrouter2
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Write
+     cli_command:
+       command: "write"
+   - name: Reload
+     cli_command:
+       command: "reload in 1"
+       check_all: True
+       prompt:
+         - "Confirm"
+       answer:
+         - "y"
+   - name: gather_facts
+     cisco.ios.ios_facts:
+     register: jobiation_facts
+   - name: run_show_command
+     cisco.ios.ios_command:
+       commands: show running-config
+     register: jobiation_showcmd
+   - name: Myrouter2_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - interface loopback 6
+       - end
+     when: jobiation_facts["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and jobiation_showcmd is search("ip name-server 192.168.254.254")
+
+###############################################################

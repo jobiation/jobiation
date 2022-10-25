@@ -21,9 +21,11 @@ cisco_product_line = "cisco.ios.ios_command";
 # Send command options
 save_facts = 1;
 facts_module = "cisco.ios.ios_facts";
+search_facts = "";
 
 save_showcmd = 1;
 showcmd = "show running-config";
+search_showcmd = "GigabitEthernet0/0/0";
 
 when_enable = 1;
 when_condition = 'jobiation_facts["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and jobiation_showcmd is search("ip name-server 192.168.254.254")';

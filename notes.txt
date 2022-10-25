@@ -10,8 +10,7 @@ ctrl + shift + i in VS code displays JSON prettier
 
 ALL:
 Figure out how to make the text editor open the playbook and hosts file.
-
-SEND COMMAND:
+Finish validating options.py
 
 GET OUTPUT:
 Did you specify your search criteria?
@@ -20,7 +19,6 @@ Do you want to run search criteria against a backup?
 Find a string on one line and then another string within a specified number or range of subsequent lines.
 Process file from bottom up?
 In the get_output module, make a file called searches and allow them to specify a command and the search criteria
-
 
 ACLs
 ACL group? - If they type manual, ask them the manual group name. Mark column?

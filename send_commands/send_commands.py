@@ -171,12 +171,8 @@ for flCol in range(len(flList)-1):
     elif re.search("str\\(" + flList[flCol] + "\\)", hostcond_content):
         tempfile.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n"); # This line is necessary for variables used in host_conditions.py
 
-# Add host conditions to tempfile.py
-filenames = ["../host_conditions.py"]
-for name in filenames:
-    with open(name) as f:
-        for line in f:
-            tempfile.write(line)
+# Add hosts_conditions.py to tempfile.py
+tempfile.write(hostcond_content);
 
 # Add commands for hosts file to tempfile.py
 tempfile.write(spaces + "hostsfile.write('       ' + devicename + ':\\n');\n");
