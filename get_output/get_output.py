@@ -16,16 +16,8 @@ req_columns = [ "devicename", "ip", "active" ];
 sys.path.insert(1, '../');
 import options
 
-# Import scfunctions file
-import scfunctions
-
-# Import search file
-import search
-
-# if hasattr(search, 'export_facts'):
-#     print(search.export_facts);
-# else:
-#     print("No facts");
+# Import gofunctions file
+import gofunctions
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -49,10 +41,6 @@ elif(options.ansible_user == ""):
     username = input("You do not have a username set. What username do you want to use? ");
 else:
     username = options.ansible_user;
-
-# # Open commands.txt and cache in variable commands_content
-# with open('commands.txt', 'r') as commands_file:
-#     commands_content = commands_file.read();
 
 # open inventory.csv
 inventoryfile = open("../inventory.csv","r");
@@ -113,16 +101,15 @@ tempfile.write("playbookfile.write('   ansible_command_timeout: "+options.ansibl
 tempfile.write("playbookfile.write('  tasks:\\n');\n");
 
 # Save facts if desired
-if hasattr(search, 'export_facts'):
-    scfunctions.saveFacts(tempfile,search.export_facts,current_dir);
+if hasattr(options, 'export_facts'):
+    os.mkdir(current_dir+"/facts");
+    gofunctions.saveFacts(tempfile,options.export_facts,current_dir);
 
 # save output from show command if desired.
-if len(search.showcmd_exports) == 0:
-    print("showcmd_exports is null");
-else:
-    print("showcmd_exports is not null");
-    for cmd in search.showcmd_exports:
-        scfunctions.saveShowCmd(tempfile,options.cisco_product_line,search.showcmd_exports[cmd],cmd,current_dir);
+if len(options.showcmd_exports) >= 1:
+    for cmd in options.showcmd_exports:
+        os.mkdir(current_dir+"/"+cmd);
+        gofunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd_exports[cmd],cmd,current_dir);
 
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");

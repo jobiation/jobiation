@@ -32,8 +32,39 @@ when_condition = 'jobiation_facts["ansible_facts"]["ansible_net_interfaces"]["Gi
 
 reload_in = 1; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
 
-#############Get Output Options
+##################################################################################
+#############Get Output Options###################################################
+##################################################################################
+
 commands_to_remove = "";
+
+## Define the jobs exports in the following format:
+## directoryname : command
+## Not that each key must be unique
+showcmd_exports = {
+    "showrun":"show running-config",
+    "showver":"show version",
+    "showint":"show int status"
+    }
+
+## Define the facts module to use for the export.
+export_facts = "cisco.ios.ios_facts";
+
+## Define search objects
+## This is optional.
+## You can write your search criteria stored in variables here and then reference the variables in the searches dictionary.
+## You can also not define any variables in this section and specify your search criteria in the searches dictionary.
+my_search_object = "17.3.4";
+
+## Define your searches in the following format:
+## columnname : directoryname!!searchcriteria
+searches = {
+    ## Example search that searches the show run output for the ntp server command.
+    "has_ntp":"showrun!!ntp server 10.1.1.1",
+    "has_tacacs":"showrun!!ip tacacs server isetacacs",
+    "needs_upgrade":"showver!!"+my_search_object,
+    "has8interfaces":"ios_facts!!GigabitEthernet0/0/7"
+    }
 
 ################ Input Validation
 boolreg =re.compile("^[0-1]$");
