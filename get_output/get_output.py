@@ -19,13 +19,21 @@ import options
 # Import scfunctions file
 import scfunctions
 
+# Import search file
+import search
+
+# if hasattr(search, 'export_facts'):
+#     print(search.export_facts);
+# else:
+#     print("No facts");
+
 # Get current date and time
 now = datetime.now() # current date and time
 date_time = now.strftime("%Y%m%d_%H%M");
 
 # # Make a directory for the job
-os.mkdir('jobs/' + date_time);
 current_dir = "jobs/" + date_time;
+os.mkdir(current_dir);
 
 # Copy hosts_header or check if username is needed in the options file
 password_prompt = " -k";
@@ -105,18 +113,16 @@ tempfile.write("playbookfile.write('   ansible_command_timeout: "+options.ansibl
 tempfile.write("playbookfile.write('  tasks:\\n');\n");
 
 # Save facts if desired
-if options.save_facts == 1:
-    scfunctions.saveFacts(tempfile,options.facts_module,current_dir);
+if hasattr(search, 'export_facts'):
+    scfunctions.saveFacts(tempfile,search.export_facts,current_dir);
 
 # save output from show command if desired.
-if options.save_showcmd == 1:
-    scfunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd,current_dir);
-
-# # Write commands
-# tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
-# tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
-# tempfile.write("playbookfile.write('      commands:\\n');\n");
-
+if len(search.showcmd_exports) == 0:
+    print("showcmd_exports is null");
+else:
+    print("showcmd_exports is not null");
+    for cmd in search.showcmd_exports:
+        scfunctions.saveShowCmd(tempfile,options.cisco_product_line,search.showcmd_exports[cmd],cmd,current_dir);
 
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
