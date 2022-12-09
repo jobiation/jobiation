@@ -1,0 +1,31 @@
+
+PLAY [jobiation_pb] ************************************************************
+
+TASK [gather_facts] ************************************************************
+ok: [Jobiation1]
+ok: [Myrouter2]
+
+TASK [copy_output_to_file] *****************************************************
+changed: [Myrouter2]
+changed: [Jobiation1]
+
+TASK [showrun] *****************************************************************
+ok: [Jobiation1]
+ok: [Myrouter2]
+
+TASK [copy_output_to_file] *****************************************************
+changed: [Jobiation1]
+changed: [Myrouter2]
+
+TASK [showver] *****************************************************************
+ok: [Jobiation1]
+ok: [Myrouter2]
+
+TASK [copy_output_to_file] *****************************************************
+changed: [Myrouter2]
+changed: [Jobiation1]
+
+PLAY RECAP *********************************************************************
+Jobiation1                 : ok=6    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+Myrouter2                  : ok=6    changed=3    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+

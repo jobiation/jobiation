@@ -3,9 +3,9 @@ import csv
 import sys
 import shutil
 import os
-hostsfile = open('jobs/20221206_1808/hosts', 'a+');
+hostsfile = open('jobs/20221207_1708/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
-playbookfile = open('jobs/20221206_1808/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20221207_1708/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 playbookfile.write('- name: jobiation_pb\n');
 playbookfile.write('  hosts: jobiation_inventory\n');
@@ -17,25 +17,19 @@ playbookfile.write('   - name: gather_facts\n');
 playbookfile.write('     cisco.ios.ios_facts:\n');
 playbookfile.write('     register: jobiation_facts\n');
 playbookfile.write('   - name: copy_output_to_file\n');
-playbookfile.write('     copy: content="{{ jobiation_facts }}" dest="jobs/20221206_1808/facts/{{ inventory_hostname }}_facts.txt"\n');
+playbookfile.write('     copy: content="{{ jobiation_facts }}" dest="jobs/20221207_1708/facts/{{ inventory_hostname }}_facts.txt"\n');
 playbookfile.write('   - name: showrun\n');
 playbookfile.write('     cisco.ios.ios_command:\n');
 playbookfile.write('       commands: show running-config\n');
 playbookfile.write('     register: showrun\n');
 playbookfile.write('   - name: copy_output_to_file\n');
-playbookfile.write('     copy: content="{{ showrun.stdout[0] }}" dest="jobs/20221206_1808/showrun/{{ inventory_hostname }}_showrun.txt"\n');
+playbookfile.write('     copy: content="{{ showrun.stdout[0] }}" dest="jobs/20221207_1708/showrun/{{ inventory_hostname }}_showrun.txt"\n');
 playbookfile.write('   - name: showver\n');
 playbookfile.write('     cisco.ios.ios_command:\n');
 playbookfile.write('       commands: show version\n');
 playbookfile.write('     register: showver\n');
 playbookfile.write('   - name: copy_output_to_file\n');
-playbookfile.write('     copy: content="{{ showver.stdout[0] }}" dest="jobs/20221206_1808/showver/{{ inventory_hostname }}_showver.txt"\n');
-playbookfile.write('   - name: showint\n');
-playbookfile.write('     cisco.ios.ios_command:\n');
-playbookfile.write('       commands: show int status\n');
-playbookfile.write('     register: showint\n');
-playbookfile.write('   - name: copy_output_to_file\n');
-playbookfile.write('     copy: content="{{ showint.stdout[0] }}" dest="jobs/20221206_1808/showint/{{ inventory_hostname }}_showint.txt"\n');
+playbookfile.write('     copy: content="{{ showver.stdout[0] }}" dest="jobs/20221207_1708/showver/{{ inventory_hostname }}_showver.txt"\n');
 with inventoryfile as invfile:
     invdata = csv.reader(invfile)
     for row in invdata:

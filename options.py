@@ -18,7 +18,10 @@ gather_facts = "no";
 ansible_command_timeout = "30";
 cisco_product_line = "cisco.ios.ios_command";
 
-# Send command options
+##################################################################################
+#############Send Commands Options###################################################
+##################################################################################
+
 save_facts = 1;
 facts_module = "cisco.ios.ios_facts";
 search_facts = "";
@@ -40,15 +43,15 @@ commands_to_remove = "";
 
 ## Define the jobs exports in the following format:
 ## directoryname : command
-## Not that each key must be unique
+## Note that each key must be unique.
 showcmd_exports = {
-    "showrun":"show running-config",
-    "showver":"show version",
-    "showint":"show int status"
+    # "showrun":"show running-config",
+    # "showver":"show version",
+    # "showint":"show int status"
     }
 
 ## Define the facts module to use for the export.
-export_facts = "cisco.ios.ios_facts";
+# facts_export = "cisco.ios.ios_facts";
 
 ## Define search objects
 ## This is optional.
@@ -60,13 +63,17 @@ my_search_object = "17.3.4";
 ## columnname : directoryname!!searchcriteria
 searches = {
     ## Example search that searches the show run output for the ntp server command.
-    "has_ntp":"showrun!!ntp server 10.1.1.1",
-    "has_tacacs":"showrun!!ip tacacs server isetacacs",
-    "needs_upgrade":"showver!!"+my_search_object,
-    "has8interfaces":"ios_facts!!GigabitEthernet0/0/7"
+    # "has_ntp":"showrun!!ntp server 10.1.1.1",
+    # "has_tacacs":"showrun!!ip tacacs server isetacacs",
+    # "needs_upgrade":"showver!!"+my_search_object,
+    "has8interfaces":"facts!!GigabitEthernet0/0/7"
     }
 
-################ Input Validation
+
+##################################################################################
+#############Input Validation#####################################################
+##################################################################################
+
 boolreg =re.compile("^[0-1]$");
 numericreg =re.compile("^[0-9]$");
 alphanumericreg =re.compile("^([0-9]?[a-z]?[A-Z]?){1,20}$");
