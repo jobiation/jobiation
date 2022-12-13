@@ -45,19 +45,23 @@ commands_to_remove = "";
 ## directoryname : command
 ## Note that each key must be unique.
 showcmd_exports = {
-    # "showrun":"show running-config",
-    # "showver":"show version",
-    # "showint":"show int status"
+    "showrun":"show running-config",
+    "showver":"show version",
+    "showint":"show int status"
     }
 
 ## Define the facts module to use for the export.
-# facts_export = "cisco.ios.ios_facts";
+facts_export = "cisco.ios.ios_facts";
+
+##################################################################################
+#############Search Output Options###################################################
+##################################################################################
 
 ## Define search objects
 ## This is optional.
 ## You can write your search criteria stored in variables here and then reference the variables in the searches dictionary.
 ## You can also not define any variables in this section and specify your search criteria in the searches dictionary.
-my_search_object = "17.3.4";
+my_search_object = "17.6.3";
 
 ## Define your searches in the following format:
 ## columnname : directoryname!!searchcriteria
@@ -65,8 +69,8 @@ searches = {
     ## Example search that searches the show run output for the ntp server command.
     # "has_ntp":"showrun!!ntp server 10.1.1.1",
     # "has_tacacs":"showrun!!ip tacacs server isetacacs",
-    # "needs_upgrade":"showver!!"+my_search_object,
-    "has8interfaces":"facts!!GigabitEthernet0/0/7"
+    "needs_upgrade":"showver!!"+my_search_object,
+    "has8interfaces":"facts!!GigabitEthernet0/1/8"
     }
 
 
