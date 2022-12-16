@@ -70,7 +70,7 @@ searches = {
     # "has_ntp":"showrun!!ntp server 10.1.1.1",
     # "has_tacacs":"showrun!!ip tacacs server isetacacs",
     "needs_upgrade":"showver!!"+my_search_object,
-    "has8interfaces":"facts!!GigabitEthernet0/1/8"
+    "has8interfaces":"showrun!!interface GigabitEthernet0/0/0(.*\n){1,4}interface GigabitEthernet0/0/1"
     }
 
 

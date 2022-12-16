@@ -18,10 +18,10 @@ import options
 now = datetime.now() # current date and time
 date_time = now.strftime("%Y%m%d_%H%M");
 
-# Set searches variable
-if len(options.searches) <= 0:
-    print("You have no searches in the searches[] dictionary. Please add on in options.py");
-    sys.exit();
+# # Make sure there are searches in the searches[] dictionary
+# if len(options.searches) <= 0:
+#     print("You have no searches in the searches[] dictionary. Please add one or more in options.py");
+#     sys.exit();
 
 # Ask the user to pick the directory to search
 dirs = [];
@@ -40,11 +40,14 @@ for dir in dirs:
 dir_choice = input("Type the number of the directory you want to search: ");
 current_dir = str(dirs[int(dir_choice)]);
 
-# Open hosts file in the chosen directory
-hostsfile = open(current_dir+"/hosts","r");
-
 # Declare hosts list
 hosts = [];
+
+# Declare a list to hold all the records in the file
+fileList = ["host,"];
+
+# Open hosts file in the chosen directory
+hostsfile = open(current_dir+"/hosts","r");
 
 # Populate hosts list
 hostsvarfound = 0;
@@ -54,10 +57,12 @@ for host in hostsfile:
         if evenodd == 0:
             evenodd = 1;
             hosts.append(host.strip().replace(':',''));
+            fileList.append(host.strip().replace(':',','));
         else:
             evenodd = 0;
     if "hosts:" in host:
         hostsvarfound = 1;
+hostsfile.close();
 
 # Iterate searches[]
 for search in options.searches:
@@ -65,15 +70,28 @@ for search in options.searches:
     searchdir = searchinfo[0];
     searchdetail = searchinfo[1];
 
+    fileList[0] = fileList[0]+search+",";
+
     #Iterate hosts[]
     for host in hosts:
         with open(current_dir+'/'+searchdir+'/'+host+'_'+searchdir+'.txt', 'r') as outputfile:
             content = outputfile.read();
         match = re.search(searchdetail, content)
         if match:
-            print("searching "+searchdir+"/"+host+".txt for "+searchdetail+" - result: Match")
+            fileList[hosts.index(host)+1] = fileList[hosts.index(host)+1]+"1,";
         else:
-            print("searching "+searchdir+"/"+host+".txt for "+searchdetail+" - result: No Match")
+            fileList[hosts.index(host)+1] = fileList[hosts.index(host)+1]+"0,";
+
+# Declare report file
+reportfile = open(current_dir+"/report.csv","w");
+
+# Populate report file
+for hostrecord in fileList:
+    reportfile.write(hostrecord+"\n");
+    print(hostrecord);
+
+# Close report file
+reportfile.close();
 
 sys.exit();
 
