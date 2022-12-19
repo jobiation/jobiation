@@ -18,7 +18,6 @@ What column do you want to mark? (if not specified)
 Do you want to run search criteria against a backup?
 Find a string on one line and then another string within a specified number or range of subsequent lines.
 Process file from bottom up?
-In the get_output module, make a file called searches and allow them to specify a command and the search criteria
 
 ACLs
 ACL group? - If they type manual, ask them the manual group name. Mark column?
@@ -49,47 +48,3 @@ literal strings
 r is raw string
 know what kind of line endings you have
 """
-
-#####################################When Reference###################################
-
----
-- name: Get_Output
-  hosts: jobiation_inventory
-  gather_facts: no
-  connection: local
-  vars:
-    ansible_command_timeout: 30
-  tasks:
-# #################when show command#####################
-#   - name: run_show_command
-#     cisco.ios.ios_command:
-#       commands: show run
-#     register: showcmdoutput
-#   - name: copy_cmd_output_to_file
-#     copy: content="{{ showcmdoutput.stdout[0] }}" dest="{{ inventory_hostname }}.txt"
-#   - name: run_ios_commands
-#     cisco.ios.ios_command:
-#       commands:
-#         - config t
-#         - end
-#     when: showcmdoutput is search("10.18.203.55")
-
-  # ###################when facts################3
-  # - name: gather_facts
-  #   cisco.ios.ios_facts:
-  #   register: ios_facts
-  # - name: copy_output_to_file
-  #   copy: content="{{ ios_facts }}" dest="{{ inventory_hostname }}.json"
-  # - name: run_ios_commands
-  #   cisco.ios.ios_command:
-  #     commands:
-  #       - config t
-  #       - end
-  #   when: ios_facts['ansible_facts']['ansible_net_filesystems_info']['bootflash:']['spacefree_kb'] >= 1537809
-
-#################################Try Except##################################33
-try:
-    options.save_facts2
-    print("variable exists")
-except:
-    print("Variable does not exist.")

@@ -22,35 +22,38 @@ cisco_product_line = "cisco.ios.ios_command";
 #############Send Commands Options###################################################
 ##################################################################################
 
-save_facts = 1;
-facts_module = "cisco.ios.ios_facts";
-search_facts = "";
+### Uncomment and set a value for facts_module to save facts from remote devices.
+### In when condition statements you can reference the the facts output as 'factsoutput'
+#facts_module = "cisco.ios.ios_facts";
 
-save_showcmd = 1;
-showcmd = "show running-config";
-search_showcmd = "GigabitEthernet0/0/0";
+### Uncomment showcmd and specify a show command that's output you want to register.
+### In when condition statements you can reference the show cammand's output as 'showcmd'
+#showcmd = "show running-config";
 
-when_enable = 1;
-when_condition = 'jobiation_facts["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and jobiation_showcmd is search("ip name-server 192.168.254.254")';
+### Uncomment when_conditon ans specify a when statement you wish to 
+#when_condition = 'factsoutput["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and showcmd is search("ip name-server 192.168.254.254")';
 
-reload_in = 1; # Change this to a non-zero value to do a delayed restart of all Cisco devices included in the hosts file
+### Uncomment the reload_in variable to begin your playbook with a write and reload command.
+### Set reload_in to 0 if you want to reload immediately or set reload_in to the number of minutes you want to delay the reload.
+#reload_in = 60; 
 
 ##################################################################################
 #############Get Output Options###################################################
 ##################################################################################
 
-commands_to_remove = "";
+commands_to_remove = [];
 
 ## Define the jobs exports in the following format:
 ## directoryname : command
 ## Note that each key must be unique.
+### You can comment out individual exports but do not comment out the whole showcmd_exports dictionary
 showcmd_exports = {
     "showrun":"show running-config",
     "showver":"show version",
-    "showint":"show int status"
+    # "showint":"show int status"
     }
 
-## Define the facts module to use for the export.
+## If you wish to export facts, uncomment facts_export and define the facts module to use for the export.
 facts_export = "cisco.ios.ios_facts";
 
 ##################################################################################
@@ -65,6 +68,7 @@ my_search_object = "17.6.3";
 
 ## Define your searches in the following format:
 ## columnname : directoryname!!searchcriteria
+# You can comment out searches but do not comment out the whole searches dictionary.
 searches = {
     ## Example search that searches the show run output for the ntp server command.
     # "has_ntp":"showrun!!ntp server 10.1.1.1",

@@ -43,8 +43,8 @@ else:
     username = options.ansible_user;
 
 # Ask user if they want to do a write and reload
-if options.reload_in >= 1:
-    confirm_reload = input("ATTENTION! You have the reload_in option set to a non-zero value.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue. ");
+if hasattr(options, 'reload_in'):
+    confirm_reload = input("ATTENTION! You have the reload_in option enabled.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue. ");
     if confirm_reload.lower() != "yes":
         print("Aborting!");
         sys.exit();
@@ -125,15 +125,15 @@ if(replacements_required == 0):
     tempfile.write("playbookfile.write('  tasks:\\n');\n");
 
     # Add write and reload if desired
-    if options.reload_in >= 1:
+    if hasattr(options, 'reload_in'):
         scfunctions.reloadIn(tempfile,options.reload_in,spaces);
 
     # Save facts if desired
-    if options.save_facts == 1:
+    if hasattr(options, 'facts_module'):
         scfunctions.saveFacts(tempfile,options.facts_module,spaces);
 
     # save output from show command if desired.
-    if options.save_showcmd == 1:
+    if hasattr(options, 'showcmd'):
         scfunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd,spaces);
 
     # Write commands
@@ -145,7 +145,7 @@ if(replacements_required == 0):
     tempfile.write("playbookfile.write('\\n');\n");
 
     # Add when condition if desired
-    if options.when_enable == 1:
+    if hasattr(options, 'when_condition'):
         tempfile.write("playbookfile.write('     when: " + options.when_condition + "\\n');\n");
 
 tempfile.write("with inventoryfile as invfile:\n");
@@ -188,15 +188,15 @@ if(replacements_required >= 1):
     tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
 
     # Add write and reload if desired
-    if options.reload_in >= 1:
+    if hasattr(options, 'reload_in'):
         scfunctions.reloadIn(tempfile,options.reload_in,spaces);
 
     # Save facts if desired
-    if options.save_facts == 1:
+    if hasattr(options, 'facts_module'):
         scfunctions.saveFacts(tempfile,options.facts_module,spaces);
 
     # Save output from show command if desired.
-    if options.save_showcmd == 1:
+    if hasattr(options, 'showcmd'):
         scfunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd,spaces);
 
     # Add commands to tempfile.py
@@ -216,7 +216,7 @@ if(replacements_required >= 1):
     tempfile.write(spaces + "playbookfile.write('\\n');\n");
 
     # Add when condition if desired
-    if options.when_enable == 1:
+    if hasattr(options, 'when_condition'):
         tempfile.write(spaces + "playbookfile.write('     when: " + options.when_condition + "\\n');\n");
 
     # Make line between devices for easier reading.

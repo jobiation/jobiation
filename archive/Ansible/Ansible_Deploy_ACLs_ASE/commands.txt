@@ -1,1 +1,0 @@
-/var/ansiblerepo/playbooks/ansible_deploy_acl_ase/ansible_temp_task.sh

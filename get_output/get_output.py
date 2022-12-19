@@ -1,14 +1,12 @@
 #!/usr/bin/env python3
 
 # Imports
-import csv
 import sys # For exiting the script early with sys.exit();
 import shutil # For copyfile
 import os # For mkdir
 from datetime import datetime
 import subprocess # For running a bash script
 import re
-import pathlib
 
 # Make list of required columns
 req_columns = [ "devicename", "ip", "active" ];
@@ -59,24 +57,6 @@ if len(options.searches) >= 1:
 if facts_export == 0 and showcmd_exports == 0:
     print("facts_export is not set and showcmd_exports is null so there is nothing to do. Please check options.py.");
     sys.exit();
-
-# if facts_export == 0 and showcmd_exports == 0 and searches == 1:
-#     dirs = [];
-#     jobs_dir = pathlib.Path("jobs").iterdir();
-#     for dir in jobs_dir:
-#         dirs.append(str(dir));
-#     if len(dirs) == 0:
-#         print("There are no jobs to search. Please open options.py and uncomment facts_export or add at least one item to the showcmd_exports dictionary.");
-#         sys.exit();
-#     dirs_count = 0;
-#     dirs.sort(reverse=True);
-#     for dir in dirs:
-#         dirs_count = dirs_count + 1;
-#         if dirs_count <= 5:
-#             print("[" + str(dirs.index(dir)) + "]" + dir);
-#     dir_choice = input("Type the number of the directory you want to search: ");
-#     current_dir = str(dirs[int(dir_choice)]);
-
 
 # Copy hosts_header or check if username is needed in the options file
 password_prompt = " -k";
@@ -217,54 +197,3 @@ with open(current_dir + "/hosts", "w") as hosts:
 if(options.remove_hosts_header == 1):
     if os.path.exists("../hosts_header"):
         os.remove("../hosts_header");
-
-
-######################### Search #############################
-
-# Make temp python file
-tempfile2 = open("tmp/tempfile2.py","w");
-
-# Add shebang and imports to tempfile.py
-tempfile2.write("#!/usr/bin/env python3\n");
-tempfile2.write("import csv\n");
-tempfile2.write("import sys\n");
-tempfile2.write("import shutil\n");
-tempfile2.write("import os\n");
-
-# Open files in tempfile.py
-tempfile2.write("inventoryfile = open('../inventory.csv', 'w+');\n");
-
-tempfile2.write("with inventoryfile as invfile:\n");
-tempfile2.write("    invdata = csv.reader(invfile)\n");
-tempfile2.write("    for row in invdata:\n");
-
-# Open host_conditions.py and cache in variable hostcond_content
-with open('../host_conditions.py', 'r') as hostcond_file:
-    hostcond_content = hostcond_file.read();
-
-# Add required columns and columns used in host_conditions.py
-for flCol in range(len(flList)-1):
-    if flList[flCol] in req_columns:
-        tempfile2.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n");
-    elif re.search("str\\(" + flList[flCol] + "\\)", hostcond_content):
-        tempfile2.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n"); # This line is necessary for variables used in host_conditions.py
-
-# Add hosts_conditions.py to tempfile.py
-tempfile2.write(hostcond_content);
-
-tempfile2.write("        with open(" + current_dir + "+'/'+devicename+'.txt', 'r') as showcmdfile:\n");
-tempfile2.write("            filecontent = showcmdfile.read();\n");
-tempfile2.write("        match = re.search('" + options.search_showcmd + "',filecontent)\n");
-# tempfile.write("        \n");
-
-
-# with open('.txt', 'r') as showcmdfile:
-#     content = showcmdfile.read();
-# match = re.search('(interface GigabitEthernet0/0/0(.*\n){1,3}ip address)(.*\n){1,6}interface GigabitEthernet0/0/1', content)
-# if match:
-#   print("match");
-# else:
-#   print("no match");
-
-# Close tempfile2.py
-tempfile2.close();

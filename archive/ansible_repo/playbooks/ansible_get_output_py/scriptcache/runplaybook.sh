@@ -1,2 +1,0 @@
-#!/bin/bash
-/usr/bin/ansible-playbook --vault-id ansiblevaultuser@/var/.ansiblecreds /var/ansiblerepo/playbooks/ansible_get_output_py/jobs/20220819_1625/ansible_task.yaml > /var/ansiblerepo/playbooks/ansible_get_output_py/jobs/20220819_1625/playbook_result.txt

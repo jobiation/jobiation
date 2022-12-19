@@ -1,3 +1,0 @@
-devicename,active,ip,location,model,arg1,arg2,arg3,arg4,arg5,aclgrp,aclname,aclsub1,aclsub2,aclint1,aclint1dir,aclint2,aclint2dir,aclpostadd,aclpreadd,acllastcmd
-skipline,active,ip,location,model,,,,done,Safe?,,,,,,,,,,,
-myrouter,1,10.1.1.1,field,C1111,,,,1,1,deepase,102,1.1.1.0 0.0.0.255,10.1.1.0 0.0.0.255,GigabitEthernet0/0/0.1,in,GigabitEthernet0/0/0.2,in,1,,deny ip any any log
