@@ -18,11 +18,6 @@ import options
 now = datetime.now() # current date and time
 date_time = now.strftime("%Y%m%d_%H%M");
 
-# # Make sure there are searches in the searches[] dictionary
-# if len(options.searches) <= 0:
-#     print("You have no searches in the searches[] dictionary. Please add one or more in options.py");
-#     sys.exit();
-
 # Ask the user to pick the directory to search
 dirs = [];
 jobs_dir = pathlib.Path("jobs").iterdir();

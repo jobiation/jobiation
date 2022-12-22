@@ -41,7 +41,12 @@ cisco_product_line = "cisco.ios.ios_command";
 #############Get Output Options###################################################
 ##################################################################################
 
-commands_to_remove = [];
+### If there are commands you would rather not store for security reasons, add them to the commands_to_remove list.
+### Make sure to leave off the trailing comma on the last item in the list.
+commands_to_remove = {
+  "showrun":"enable secret!!username!!flash(.*).bin",
+  "showver":"Configuration (.*)0x2102$!!10 Gigabit Ethernet interfaces"
+};
 
 ## Define the jobs exports in the following format:
 ## directoryname : command
@@ -49,9 +54,9 @@ commands_to_remove = [];
 ### You can comment out individual exports but do not comment out the whole showcmd_exports dictionary
 showcmd_exports = {
     "showrun":"show running-config",
-    "showver":"show version",
+    "showver":"show version"
     # "showint":"show int status"
-    }
+    };
 
 ## If you wish to export facts, uncomment facts_export and define the facts module to use for the export.
 facts_export = "cisco.ios.ios_facts";
@@ -75,7 +80,7 @@ searches = {
     # "has_tacacs":"showrun!!ip tacacs server isetacacs",
     "needs_upgrade":"showver!!"+my_search_object,
     "has8interfaces":"showrun!!interface GigabitEthernet0/0/0(.*\n){1,4}interface GigabitEthernet0/0/1"
-    }
+    };
 
 
 ##################################################################################

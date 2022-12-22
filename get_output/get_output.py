@@ -7,6 +7,7 @@ import os # For mkdir
 from datetime import datetime
 import subprocess # For running a bash script
 import re
+import pathlib
 
 # Make list of required columns
 req_columns = [ "devicename", "ip", "active" ];
@@ -125,11 +126,15 @@ if hasattr(options, 'facts_export'):
     os.mkdir(current_dir+"/facts");
     gofunctions.saveFacts(tempfile,options.facts_export,current_dir);
 
+# # Declare dirs[] list
+# dirs = [];
+
 # save output from show command if desired.
 if len(options.showcmd_exports) >= 1:
-    for cmd in options.showcmd_exports:
-        os.mkdir(current_dir+"/"+cmd);
-        gofunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd_exports[cmd],cmd,current_dir);
+    for subdir in options.showcmd_exports:
+        os.mkdir(current_dir+"/"+subdir);
+        # dirs.append(subdir);
+        gofunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd_exports[subdir],subdir,current_dir);
 
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
@@ -197,3 +202,13 @@ with open(current_dir + "/hosts", "w") as hosts:
 if(options.remove_hosts_header == 1):
     if os.path.exists("../hosts_header"):
         os.remove("../hosts_header");
+
+##################################Remove Sensitive Data##############################################
+
+dirs = options.commands_to_remove;
+
+for dir in dirs:
+    cmds_to_remove = str(dirs[dir]);
+    subdirlist = pathlib.Path(current_dir+"/"+dir).iterdir();
+    for cmdfile in subdirlist:
+        gofunctions.cleanFile(cmdfile,cmds_to_remove);

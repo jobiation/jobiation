@@ -145,7 +145,6 @@ username deeptech secret 9 $9$v/7Q0fyxX6y5B.$H7dldX7r93xu3gv6q0MX1zdi/xWNF/jrgVT
 username jobiation secret 9 $9$WTZXMlnGoSnCO.$4v0hdIaG0Xfdw6ycgOJpUBGt8CaDRpviZkk0kpSsSRk
 !
 redundancy
- mode none
 !
 !
 vlan internal allocation policy ascending
