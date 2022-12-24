@@ -50,10 +50,6 @@ if hasattr(options, 'facts_export'):
 if len(options.showcmd_exports) >= 1:
     showcmd_exports = 1;
 
-# Set searches variable
-if len(options.searches) >= 1:
-    searches = 1;
-
 # Check if there is anything to do
 if facts_export == 0 and showcmd_exports == 0:
     print("facts_export is not set and showcmd_exports is null so there is nothing to do. Please check options.py.");

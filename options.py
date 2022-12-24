@@ -18,6 +18,8 @@ gather_facts = "no";
 ansible_command_timeout = "30";
 cisco_product_line = "cisco.ios.ios_command";
 
+reload_in = 60; # This option is used with send_commands and manage_acls.
+
 ##################################################################################
 #############Send Commands Options###################################################
 ##################################################################################
@@ -35,7 +37,6 @@ cisco_product_line = "cisco.ios.ios_command";
 
 ### Uncomment the reload_in variable to begin your playbook with a write and reload command.
 ### Set reload_in to 0 if you want to reload immediately or set reload_in to the number of minutes you want to delay the reload.
-#reload_in = 60; 
 
 ##################################################################################
 #############Get Output Options###################################################
@@ -82,6 +83,34 @@ searches = {
     "has8interfaces":"showrun!!interface GigabitEthernet0/0/0(.*\n){1,4}interface GigabitEthernet0/0/1"
     };
 
+
+##################################################################################
+#############Manage ACL###################################################
+##################################################################################
+
+# Single managed ACLs
+
+aCLs = {
+
+##### Regular interfaces
+"aclname":"TACL", #1 or 0
+"declaration":"ip access-list extended TunnelACL",
+"interfaces":"interface g0/0/0,interface TunnelACL 100",
+"application":"ip access-group TunnelACL in",
+"preadd":"!TACL_pa", # 1 or 0 - Important to include the name of the acl in the column in case more than one
+"postadd":"!TACL_pa", # 1 or 0 - Important to include the name of the acl in the column in case more than one
+"lastline":"deny ip any any log" # Can be column name or literal
+
+# ##### VTY ACl Example
+# "aclname":"VTYACL",
+# "declaration":"ip access-list standard VTYACL",
+# "interfaces":"line vty 0 4, line vty 5 15",
+# "application":"ip access-class VTYACL in",
+# "preadd":"!preaddcol",
+# "postadd":"!postaddcol",
+# "lastline":"deny ip any any"
+
+}
 
 ##################################################################################
 #############Input Validation#####################################################
