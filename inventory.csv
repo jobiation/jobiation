@@ -1,4 +1,4 @@
-devicename,active,ip,location,model,arg1,arg2,arg3,arg4,arg5,TACL,TACL_pa,TACL_pa,locallan1,dummycol
-skipline,active,2,location,model,,,,,,,,,,
-Jobiation1,1,192.168.254.226,field,C1111,,,1,,,1,,,10.1.1.0 0.0.0.31,
-Myrouter2,1,192.168.254.227,field,C1111,,,1,,,1,,,10.2.1.0 0.0.0.31,
+devicename,active,ip,location,model,arg1,arg2,arg3,arg4,arg5,TACL,TACL_dir,TACL_post,TACL_pre,locallan1,dummycol
+skipline,active,ip,location,model,,,,,,,,,,,
+Jobiation1,1,192.168.254.226,field,C1111,,,1,,,1,in,,,10.1.1.0 0.0.0.31,
+Myrouter2,1,192.168.254.227,field,C1111,,,1,,,1,out,,,10.2.1.0 0.0.0.31,

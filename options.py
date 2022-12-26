@@ -18,7 +18,7 @@ gather_facts = "no";
 ansible_command_timeout = "30";
 cisco_product_line = "cisco.ios.ios_command";
 
-reload_in = 60; # This option is used with send_commands and manage_acls.
+# reload_in = 60; # This option is used with send_commands and manage_acls.
 
 ##################################################################################
 #############Send Commands Options###################################################
@@ -92,8 +92,8 @@ searches = {
 
 aCLs = {
 
-##### Regular interfaces
-"aclname":"TACL", #1 or 0
+##### Tunnel ACLs
+"aclgroup":"TACL", #1 or 0
 "declaration":"ip access-list extended TunnelACL",
 "interfaces":"interface g0/0/0,interface TunnelACL 100",
 "application":"ip access-group TunnelACL in",
@@ -102,7 +102,7 @@ aCLs = {
 "lastline":"deny ip any any log" # Can be column name or literal
 
 # ##### VTY ACl Example
-# "aclname":"VTYACL",
+# "name":"VTYACL",
 # "declaration":"ip access-list standard VTYACL",
 # "interfaces":"line vty 0 4, line vty 5 15",
 # "application":"ip access-class VTYACL in",

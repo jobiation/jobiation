@@ -3,10 +3,10 @@ import csv
 import sys
 import shutil
 import os
-hostsfile = open('jobs/20221218_1957/hosts', 'a+');
+hostsfile = open('jobs/20221226_1522/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
-commandsfile = open('commands.txt', 'r');
-playbookfile = open('jobs/20221218_1957/jobiation_task.yaml', 'w');
+commandsfile = open('templates/TACL.txt', 'r');
+playbookfile = open('jobs/20221226_1522/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 with inventoryfile as invfile:
     invdata = csv.reader(invfile)
@@ -14,8 +14,8 @@ with inventoryfile as invfile:
         devicename = row[0];
         active = row[1];
         ip = row[2];
-        arg1 = row[5];
         arg3 = row[7];
+        locallan1 = row[13];
 # Note that 'continue' means skip.
 # Conditions must be casted as strings
 # Conditions form a logical AND
@@ -39,23 +39,24 @@ with inventoryfile as invfile:
         playbookfile.write('  vars:\n');
         playbookfile.write('   ansible_command_timeout: 30\n');
         playbookfile.write('  tasks:\n');
-        playbookfile.write('   - name: gather_facts\n');
-        playbookfile.write('     cisco.ios.ios_facts:\n');
-        playbookfile.write('     register: factsoutput\n');
-        playbookfile.write('   - name: run_show_command\n');
-        playbookfile.write('     cisco.ios.ios_command:\n');
-        playbookfile.write('       commands: show running-config\n');
-        playbookfile.write('     register: showcmd\n');
         playbookfile.write('   - name: ' + devicename + '_commands\n');
         playbookfile.write('     cisco.ios.ios_command:\n');
         playbookfile.write('      commands:\n');
-        commandsfile = open('commands.txt', 'r');
+        playbookfile.write('       - interface g0/0/0\n');
+        playbookfile.write('       - no ip access-group TunnelACL in\n');
+        playbookfile.write('       - interface TunnelACL 100\n');
+        playbookfile.write('       - no ip access-group TunnelACL in\n');
+        playbookfile.write('       - no ip access-list extended TunnelACL\n');
+        commandsfile = open('templates/TACL.txt', 'r');
         for cmd in commandsfile:
             repstr = cmd;
-            repstr = repstr.replace('!arg1', arg1);
+            repstr = repstr.replace('!locallan1', locallan1);
             playbookfile.write('       - ' + repstr);
-        playbookfile.write('\n');
-        playbookfile.write('     when: factsoutput["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc01" and showcmd is search("ip name-server 192.168.254.254")\n');
+        playbookfile.write('       - ip access-list extended TunnelACL\n');
+        playbookfile.write('       - interface g0/0/0\n');
+        playbookfile.write('       - ip access-group TunnelACL in\n');
+        playbookfile.write('       - interface TunnelACL 100\n');
+        playbookfile.write('       - ip access-group TunnelACL in\n');
         playbookfile.write('\n###############################################################\n');
 
 inventoryfile.close();
