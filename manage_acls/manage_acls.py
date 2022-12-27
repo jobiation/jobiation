@@ -42,7 +42,7 @@ elif(options.ansible_user == ""):
 else:
     username = options.ansible_user;
 
-## Read aCLs dictionary
+## Read aCLs dictionary and make variables
 aclgroup = options.aCLs['aclgroup'];
 declaration = options.aCLs['declaration'];
 application = options.aCLs['application'];
@@ -53,6 +53,30 @@ if hasattr(options, 'preadd'):
 if hasattr(options, 'postadd'):
     postadd = options.aCLs['postadd'];
 
+# Declare temp file for ACL
+temptemplate_file = open("tmp/temptemplate.txt", "w");
+
+# Add commands to the temp file for removeing ACL from interfaces and redeclare ACL.
+for int in intList:
+    temptemplate_file.write(int + "\n");
+    temptemplate_file.write("no "+ application +"\n");
+temptemplate_file.write("no " + declaration + "\n");
+temptemplate_file.write(declaration + "\n");
+
+# Read chosen template into temp file
+with open("templates/"+aclgroup+".txt", 'r') as acl_template_file:
+    acl_template_content = acl_template_file.read();
+temptemplate_file.write(acl_template_content);
+acl_template_file.close();
+
+# Add commands to the temp file for reapplying the ACL
+for int in intList:
+    temptemplate_file.write(int + "\n");
+    temptemplate_file.write(application +"\n");
+
+# Close the temp file
+temptemplate_file.close();
+
 # Ask user if they want to do a write and reload
 if hasattr(options, 'reload_in'):
     confirm_reload = input("ATTENTION! You have the reload_in option enabled.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue. ");
@@ -60,8 +84,8 @@ if hasattr(options, 'reload_in'):
         print("Aborting!");
         sys.exit();
 
-# Open acl_template and cache in variable acl_template
-with open('templates/' + aclgroup + '.txt', 'r') as acl_temp:
+# Open acl template and cache in variable acl_template
+with open('tmp/temptemplate.txt', 'r') as acl_temp:
     acl_template = acl_temp.read();
 
 # open inventory.csv
@@ -81,7 +105,7 @@ replacements_required = 0;
 # Increment replacements_required variable and also validate the first line.
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
 for flCol in range(len(flList)-1):
-    if re.search("!"+flList[flCol], acl_template):
+    if re.search("!"+flList[flCol]+"!", acl_template):
         replacements_required = replacements_required+1;
     if not re.search(flAllowedChars, str(flList[flCol])):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
@@ -116,9 +140,6 @@ tempfile = open("tmp/tempfile.py","w");
 # Add shebang and imports to tempfile.py
 tempfile.write("#!/usr/bin/env python3\n");
 tempfile.write("import csv\n");
-# tempfile.write("import sys\n");
-# tempfile.write("import shutil\n");
-# tempfile.write("import os\n");
 
 # Open files in tempfile.py
 tempfile.write("hostsfile = open('" + current_dir + "/hosts', 'a+');\n");
@@ -144,19 +165,10 @@ if(replacements_required == 0):
     tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
     tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
     tempfile.write("playbookfile.write('      commands:\\n');\n");
-    for int in intList:
-        tempfile.write("playbookfile.write('       - " + int + "\\n');\n");
-        tempfile.write("playbookfile.write('       - no " + application + "\\n');\n");
-    tempfile.write("playbookfile.write('       - no " + declaration + "\\n');\n");
     
     tempfile.write("for cmd in commandsfile:\n");
     tempfile.write("    playbookfile.write('       - ' + cmd);\n");
     tempfile.write("playbookfile.write('       - " + lastline + "\\n');\n");
-
-    tempfile.write("playbookfile.write('       - " + declaration + "\\n');\n");
-    for int in intList:
-        tempfile.write("playbookfile.write('       - " + int + "\\n');\n");
-        tempfile.write("playbookfile.write('       - " + application + "\\n');\n");
 
     tempfile.write("playbookfile.write('\\n');\n");
 
@@ -164,20 +176,21 @@ tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
 tempfile.write("    for row in invdata:\n");
 
-# Make an array for variables used
+# Make a list for variables used
 vars_used = [];
 
 # Open host_conditions.py and cache in variable hostcond_content
 with open('../host_conditions.py', 'r') as hostcond_file:
     hostcond_content = hostcond_file.read();
+hostcond_file.close();
 
-# Add required columns, columns used in host_conditions.py, and columns used in the acl template to tempfile.py
+# Add required columns, columns used in host_conditions.py, columns used in the aCLs dictionary, and columns used in the acl template to tempfile.py
 for flCol in range(len(flList)-1):
     if flList[flCol] in req_columns:
         tempfile.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n");
-        if re.search("!"+flList[flCol], acl_template):
+        if re.search("!"+flList[flCol]+"!", acl_template):
             vars_used.append(flList[flCol]);
-    elif re.search("!"+flList[flCol], acl_template):
+    elif re.search("!"+flList[flCol]+"!", acl_template):
         tempfile.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n");
         vars_used.append(flList[flCol]);
     elif re.search("str\\(" + flList[flCol] + "\\)", hostcond_content):
@@ -208,25 +221,15 @@ if(replacements_required >= 1):
     tempfile.write(spaces + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
     tempfile.write(spaces + "playbookfile.write('      commands:\\n');\n");
 
-    for int in intList:
-        tempfile.write(spaces + "playbookfile.write('       - " + int + "\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       - no " + application + "\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('       - no " + declaration + "\\n');\n");
-
     # Add commands for variable replacement
-    tempfile.write(spaces + "commandsfile = open('templates/" + aclgroup + ".txt', 'r');\n");
+    tempfile.write(spaces + "commandsfile = open('tmp/temptemplate.txt', 'r');\n");
     tempfile.write(spaces + "for cmd in commandsfile:\n");
     tempfile.write(spaces + "    repstr = cmd;\n");
 
     # Make replacements
     for replacement in vars_used:
-        tempfile.write(spaces + "    repstr = repstr.replace('!"+replacement+"', "+replacement+");\n");
+        tempfile.write(spaces + "    repstr = repstr.replace('!"+replacement+"!', "+replacement+");\n");
     tempfile.write(spaces + "    playbookfile.write('       - ' + repstr);\n");
-
-    tempfile.write(spaces + "playbookfile.write('       - " + declaration + "\\n');\n");
-    for int in intList:
-        tempfile.write(spaces + "playbookfile.write('       - " + int + "\\n');\n");
-        tempfile.write(spaces + "playbookfile.write('       - " + application + "\\n');\n");
 
     # Make line between devices for easier reading.
     tempfile.write(spaces + "playbookfile.write('\\n###############################################################\\n');\n");

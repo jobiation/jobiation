@@ -93,12 +93,12 @@ searches = {
 aCLs = {
 
 ##### Tunnel ACLs
-"aclgroup":"TACL", #1 or 0
+"aclgroup":"tACL", #1 or 0
 "declaration":"ip access-list extended TunnelACL",
 "interfaces":"interface g0/0/0,interface TunnelACL 100",
 "application":"ip access-group TunnelACL in",
-"preadd":"!TACL_pa", # 1 or 0 - Important to include the name of the acl in the column in case more than one
-"postadd":"!TACL_pa", # 1 or 0 - Important to include the name of the acl in the column in case more than one
+"preadd":"!tACL_pre!", # 1 or 0 - Important to include the name of the acl in the column in case more than one
+"postadd":"!tACL_post!", # 1 or 0 - Important to include the name of the acl in the column in case more than one
 "lastline":"deny ip any any log" # Can be column name or literal
 
 # ##### VTY ACl Example

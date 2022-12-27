@@ -3,10 +3,10 @@ import csv
 import sys
 import shutil
 import os
-hostsfile = open('jobs/20221218_1957/hosts', 'a+');
+hostsfile = open('jobs/20221227_1615/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
 commandsfile = open('commands.txt', 'r');
-playbookfile = open('jobs/20221218_1957/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20221227_1615/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 with inventoryfile as invfile:
     invdata = csv.reader(invfile)
@@ -39,13 +39,6 @@ with inventoryfile as invfile:
         playbookfile.write('  vars:\n');
         playbookfile.write('   ansible_command_timeout: 30\n');
         playbookfile.write('  tasks:\n');
-        playbookfile.write('   - name: gather_facts\n');
-        playbookfile.write('     cisco.ios.ios_facts:\n');
-        playbookfile.write('     register: factsoutput\n');
-        playbookfile.write('   - name: run_show_command\n');
-        playbookfile.write('     cisco.ios.ios_command:\n');
-        playbookfile.write('       commands: show running-config\n');
-        playbookfile.write('     register: showcmd\n');
         playbookfile.write('   - name: ' + devicename + '_commands\n');
         playbookfile.write('     cisco.ios.ios_command:\n');
         playbookfile.write('      commands:\n');
@@ -55,7 +48,6 @@ with inventoryfile as invfile:
             repstr = repstr.replace('!arg1', arg1);
             playbookfile.write('       - ' + repstr);
         playbookfile.write('\n');
-        playbookfile.write('     when: factsoutput["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc01" and showcmd is search("ip name-server 192.168.254.254")\n');
         playbookfile.write('\n###############################################################\n');
 
 inventoryfile.close();
