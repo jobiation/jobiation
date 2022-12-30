@@ -1,12 +1,8 @@
 #!/usr/bin/env python3
 
 # Imports
-import csv
 import sys # For exiting the script early with sys.exit();
-import shutil # For copyfile
-import os # For mkdir
 from datetime import datetime
-import subprocess # For running a bash script
 import re
 import pathlib
 

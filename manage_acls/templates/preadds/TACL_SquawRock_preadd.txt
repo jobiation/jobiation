@@ -1,2 +1,0 @@
-remark ........................preadd for Squaw Rock
-deny ip any 10.2.2.2 log

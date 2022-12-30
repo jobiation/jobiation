@@ -1,0 +1,2 @@
+remark ..............................Post add for Myrouter2
+permit ip !locallan host 10.4.1.1

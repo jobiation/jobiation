@@ -1,0 +1,2 @@
+remark ........................Post add for jobiation1
+deny ip any 10.2.2.2 log

@@ -1,0 +1,2 @@
+remark ..............................Pre add for Myrouter2
+permit ip !locallan host 10.1.1.1

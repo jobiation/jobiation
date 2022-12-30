@@ -1,13 +1,12 @@
 interface g0/0/0
-no ip access-group TunnelACL in
+no ip access-group TunnelACL !tACL_dir!
 interface TunnelACL 100
-no ip access-group TunnelACL in
+no ip access-group TunnelACL !tACL_dir!
 no ip access-list extended TunnelACL
 ip access-list extended TunnelACL
-permit host 10.1.1.1 10.18.0.0 0.0.255.255
-permit host 10.1.1.2 10.9.0.0 0.0.15.255
-permit ip any any
-interface g0/0/0
-ip access-group TunnelACL in
+permit host !locallan1! 10.18.0.0 0.0.255.255
+permit host !locallan1! 10.9.0.0 0.0.15.255
+deny ip any any loginterface g0/0/0
+ip access-group TunnelACL !tACL_dir!
 interface TunnelACL 100
-ip access-group TunnelACL in
+ip access-group TunnelACL !tACL_dir!

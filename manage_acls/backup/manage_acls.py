@@ -8,8 +8,6 @@ import os # For mkdir
 from datetime import datetime
 import subprocess # For running a bash script
 import re
-import pathlib
-import os
 
 # Make array of required columns
 req_columns = [ "devicename", "ip", "active" ];
@@ -26,12 +24,8 @@ now = datetime.now() # current date and time
 date_time = now.strftime("%Y%m%d_%H%M");
 
 # # Make a directory for the job
-if os.path.isdir('jobs/' + date_time):
-    print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
-else:
-    os.mkdir('jobs/' + date_time);
-    current_dir = "jobs/" + date_time;
-
+os.mkdir('jobs/' + date_time);
+current_dir = "jobs/" + date_time;
 
 # Copy hosts_header or check if username is needed in the options file
 password_prompt = " -k";
@@ -53,7 +47,11 @@ aclgroup = options.aCLs['aclgroup'];
 declaration = options.aCLs['declaration'];
 application = options.aCLs['application'];
 intList = options.aCLs['interfaces'].split(",");
-lastline = options.aCLs['lastline'];
+# lastline = options.aCLs['lastline'];
+# if hasattr(options, 'preadd'):
+#     preadd = int(options.aCLs['preadd']);
+# if hasattr(options, 'postadd'):
+#     postadd = int(options.aCLs['postadd']);
 
 # Declare temp file for ACL
 temptemplate_file = open("tmp/temptemplate.txt", "w");
@@ -69,9 +67,7 @@ temptemplate_file.write(declaration + "\n");
 with open("templates/"+aclgroup+".txt", 'r') as acl_template_file:
     acl_template_content = acl_template_file.read();
 temptemplate_file.write(acl_template_content);
-
-# Add last line
-temptemplate_file.write(lastline);
+acl_template_file.close();
 
 # Add commands to the temp file for reapplying the ACL
 for int in intList:
@@ -80,93 +76,6 @@ for int in intList:
 
 # Close the temp file
 temptemplate_file.close();
-
-# Make template file for hosts that have only preadd or pre and postadd.
-preadds = pathlib.Path("templates/"+aclgroup+"/preadds").iterdir();
-
-for preadd in preadds:
-    hostname = str(preadd).replace("templates/"+aclgroup+"/preadds/","");
-
-    # Declare temp file for ACL
-    preadd_template = open("tmp/"+hostname, "w");
-
-    # Add commands to the temp file for removeing ACL from interfaces and redeclare ACL.
-    for int in intList:
-        preadd_template.write(int + "\n");
-        preadd_template.write("no "+ application +"\n");
-    preadd_template.write("no " + declaration + "\n");
-    preadd_template.write(declaration + "\n");
-
-    # Read preadd file into template
-    with open(preadd, 'r') as preadd_as:
-        preadd_content = preadd_as.read();
-    preadd_template.write(preadd_content);    
-
-    # Read chosen template into temp file
-    preadd_template.write(acl_template_content);
-
-    # Check if post add exists for the same host
-    if os.path.isfile("templates/"+aclgroup+"/postadds/"+hostname):
-        with open("templates/"+aclgroup+"/postadds/"+hostname, 'r') as postadd_as:
-            postadd_content = postadd_as.read();
-        preadd_template.write(postadd_content);  
-
-    # Add last line
-    preadd_template.write(lastline);
-
-    # Add commands to the temp file for reapplying the ACL
-    for int in intList:
-        preadd_template.write(int + "\n");
-        preadd_template.write(application +"\n");
-
-    # Close the temp file
-    preadd_template.close();
-
-# Make template file for hosts that have only preadd or pre and postadd.
-postadds = pathlib.Path("templates/"+aclgroup+"/postadds").iterdir();
-
-for postadd in postadds:
-    hostname = str(postadd).replace("templates/"+aclgroup+"/postadds/","");
-
-    # Check if template file was already created by the preadd block
-    if os.path.isfile("tmp/"+hostname):
-        print("post add file already created for " + hostname);
-    else:
-        # Declare temp file for ACL
-        postadd_template = open("tmp/"+hostname, "w");
-
-        # Add commands to the temp file for removeing ACL from interfaces and redeclare ACL.
-        for int in intList:
-            postadd_template.write(int + "\n");
-            postadd_template.write("no "+ application +"\n");
-        postadd_template.write("no " + declaration + "\n");
-        postadd_template.write(declaration + "\n");
-
-        # Read chosen template into temp file
-        postadd_template.write(acl_template_content);
-
-        # Read preadd file into template
-        with open(postadd, 'r') as postadd_as:
-            postadd_content = postadd_as.read();
-        postadd_template.write(postadd_content);
-
-        # Add last line
-        postadd_template.write(lastline);
-
-        # Add commands to the temp file for reapplying the ACL
-        for int in intList:
-            postadd_template.write(int + "\n");
-            postadd_template.write(application +"\n");
-
-        # Close the temp file
-        postadd_template.close();
-
-acl_template_file.close();
-
-sys.exit();
-
-prepost = pathlib.Path("templates/"+aclgroup+"/postadds").iterdir();
-
 
 # Ask user if they want to do a write and reload
 if hasattr(options, 'reload_in'):
@@ -202,6 +111,11 @@ for flCol in range(len(flList)-1):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
         sys.exit();
 
+# Make spaces variable
+# if replacements_required == 0:
+#     spaces = "";
+# else:
+#     spaces = "        ";
 spaces = "        ";
 
 # Build Hosts header if use_hosts_header == 0
@@ -233,6 +147,30 @@ tempfile.write("inventoryfile = open('../inventory.csv', 'r');\n");
 tempfile.write("commandsfile = open('templates/" + aclgroup + ".txt', 'r');\n");
 tempfile.write("playbookfile = open('" + current_dir + "/jobiation_task.yaml', 'w');\n");
 tempfile.write("playbookfile.write('---\\n');\n");
+
+# Write to playbook file in tempfile.py if replacements required
+if(replacements_required == 0):
+    tempfile.write("playbookfile.write('- name: jobiation_pb\\n');\n");
+    tempfile.write("playbookfile.write('  hosts: jobiation_inventory\\n');\n");
+    tempfile.write("playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
+    tempfile.write("playbookfile.write('  vars:\\n');\n");
+    tempfile.write("playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
+    tempfile.write("playbookfile.write('  tasks:\\n');\n");
+
+    # Add write and reload if desired
+    if hasattr(options, 'reload_in'):
+        mafunctions.reloadIn(tempfile,options.reload_in,spaces);
+
+    # Write commands
+    tempfile.write("playbookfile.write('   - name: jobiation_commands\\n');\n");
+    tempfile.write("playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+    tempfile.write("playbookfile.write('      commands:\\n');\n");
+    
+    tempfile.write("for cmd in commandsfile:\n");
+    tempfile.write("    playbookfile.write('       - ' + cmd);\n");
+    # tempfile.write("playbookfile.write('       - " + lastline + "\\n');\n");
+
+    tempfile.write("playbookfile.write('\\n');\n");
 
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
