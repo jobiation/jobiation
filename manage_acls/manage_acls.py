@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 
 # Imports
-import csv
 import sys # For exiting the script early with sys.exit();
 import shutil # For copyfile
 import os # For mkdir
@@ -55,31 +54,37 @@ application = options.aCLs['application'];
 intList = options.aCLs['interfaces'].split(",");
 lastline = options.aCLs['lastline'];
 
+# Remove the aclgroups temp directory if it exists and recreate it
+if os.path.isdir("tmp/"+ aclgroup):
+    shutil.rmtree("tmp/"+ aclgroup);
+os.mkdir("tmp/"+ aclgroup);
+
 # Declare temp file for ACL
-temptemplate_file = open("tmp/temptemplate.txt", "w");
+standard_template = open("tmp/" + aclgroup + "/standard_template.txt", "w");
 
 # Add commands to the temp file for removeing ACL from interfaces and redeclare ACL.
 for int in intList:
-    temptemplate_file.write(int + "\n");
-    temptemplate_file.write("no "+ application +"\n");
-temptemplate_file.write("no " + declaration + "\n");
-temptemplate_file.write(declaration + "\n");
+    standard_template.write(int + "\n");
+    standard_template.write("no "+ application +"\n");
+standard_template.write("no " + declaration + "\n");
+standard_template.write(declaration + "\n");
 
 # Read chosen template into temp file
-with open("templates/"+aclgroup+".txt", 'r') as acl_template_file:
-    acl_template_content = acl_template_file.read();
-temptemplate_file.write(acl_template_content);
+with open("templates/"+aclgroup+".txt", 'r') as acl_template_as:
+    acl_template_content = acl_template_as.read();
+standard_template.write(acl_template_content);
+acl_template_as.close();
 
 # Add last line
-temptemplate_file.write(lastline);
+standard_template.write(lastline+"\n");
 
 # Add commands to the temp file for reapplying the ACL
 for int in intList:
-    temptemplate_file.write(int + "\n");
-    temptemplate_file.write(application +"\n");
+    standard_template.write(int + "\n");
+    standard_template.write(application +"\n");
 
 # Close the temp file
-temptemplate_file.close();
+standard_template.close();
 
 # Make template file for hosts that have only preadd or pre and postadd.
 preadds = pathlib.Path("templates/"+aclgroup+"/preadds").iterdir();
@@ -88,7 +93,7 @@ for preadd in preadds:
     hostname = str(preadd).replace("templates/"+aclgroup+"/preadds/","");
 
     # Declare temp file for ACL
-    preadd_template = open("tmp/"+hostname, "w");
+    preadd_template = open("tmp/"+aclgroup+"/"+hostname, "w");
 
     # Add commands to the temp file for removeing ACL from interfaces and redeclare ACL.
     for int in intList:
@@ -100,7 +105,8 @@ for preadd in preadds:
     # Read preadd file into template
     with open(preadd, 'r') as preadd_as:
         preadd_content = preadd_as.read();
-    preadd_template.write(preadd_content);    
+    preadd_template.write(preadd_content);
+    preadd_as.close();
 
     # Read chosen template into temp file
     preadd_template.write(acl_template_content);
@@ -109,10 +115,11 @@ for preadd in preadds:
     if os.path.isfile("templates/"+aclgroup+"/postadds/"+hostname):
         with open("templates/"+aclgroup+"/postadds/"+hostname, 'r') as postadd_as:
             postadd_content = postadd_as.read();
-        preadd_template.write(postadd_content);  
+        preadd_template.write(postadd_content);
+        postadd_as.close();
 
     # Add last line
-    preadd_template.write(lastline);
+    preadd_template.write(lastline+"\n");
 
     # Add commands to the temp file for reapplying the ACL
     for int in intList:
@@ -129,11 +136,11 @@ for postadd in postadds:
     hostname = str(postadd).replace("templates/"+aclgroup+"/postadds/","");
 
     # Check if template file was already created by the preadd block
-    if os.path.isfile("tmp/"+hostname):
+    if os.path.isfile("tmp/"+aclgroup+"/"+hostname):
         print("post add file already created for " + hostname);
     else:
         # Declare temp file for ACL
-        postadd_template = open("tmp/"+hostname, "w");
+        postadd_template = open("tmp/"+aclgroup+"/"+hostname, "w");
 
         # Add commands to the temp file for removeing ACL from interfaces and redeclare ACL.
         for int in intList:
@@ -149,9 +156,10 @@ for postadd in postadds:
         with open(postadd, 'r') as postadd_as:
             postadd_content = postadd_as.read();
         postadd_template.write(postadd_content);
+        postadd_as.close();
 
         # Add last line
-        postadd_template.write(lastline);
+        postadd_template.write(lastline+"\n");
 
         # Add commands to the temp file for reapplying the ACL
         for int in intList:
@@ -161,13 +169,6 @@ for postadd in postadds:
         # Close the temp file
         postadd_template.close();
 
-acl_template_file.close();
-
-sys.exit();
-
-prepost = pathlib.Path("templates/"+aclgroup+"/postadds").iterdir();
-
-
 # Ask user if they want to do a write and reload
 if hasattr(options, 'reload_in'):
     confirm_reload = input("ATTENTION! You have the reload_in option enabled.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue. ");
@@ -176,7 +177,7 @@ if hasattr(options, 'reload_in'):
         sys.exit();
 
 # Open acl template and cache in variable acl_template
-with open('tmp/temptemplate.txt', 'r') as acl_temp:
+with open("tmp/"+ aclgroup +"/standard_template.txt", "r") as acl_temp:
     acl_template = acl_temp.read();
 
 # open inventory.csv
@@ -190,14 +191,11 @@ flList = firstline.split(",");
 # Close the inventory file
 inventoryfile.close();
 
-# Make flag variable for replacements
-replacements_required = 0;
-
-# Increment replacements_required variable and also validate the first line.
+# Validate the first line.
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
 for flCol in range(len(flList)-1):
-    if re.search("!"+flList[flCol]+"!", acl_template):
-        replacements_required = replacements_required+1;
+    # if re.search("!"+flList[flCol]+"!", acl_template):
+    #     replacements_required = replacements_required+1;
     if not re.search(flAllowedChars, str(flList[flCol])):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
         sys.exit();
@@ -226,11 +224,15 @@ tempfile = open("tmp/tempfile.py","w");
 # Add shebang and imports to tempfile.py
 tempfile.write("#!/usr/bin/env python3\n");
 tempfile.write("import csv\n");
+tempfile.write("import os\n");
+
+# Write ACL group to the temp file
+tempfile.write("aclgroup = '"+ aclgroup +"';\n");
 
 # Open files in tempfile.py
 tempfile.write("hostsfile = open('" + current_dir + "/hosts', 'a+');\n");
 tempfile.write("inventoryfile = open('../inventory.csv', 'r');\n");
-tempfile.write("commandsfile = open('templates/" + aclgroup + ".txt', 'r');\n");
+# tempfile.write("standard_commandsfile = open('tmp/" + aclgroup + "/standard_template.txt', 'r');\n");
 tempfile.write("playbookfile = open('" + current_dir + "/jobiation_task.yaml', 'w');\n");
 tempfile.write("playbookfile.write('---\\n');\n");
 
@@ -265,43 +267,48 @@ tempfile.write(hostcond_content);
 tempfile.write(spaces + "hostsfile.write('       ' + devicename + ':\\n');\n");
 tempfile.write(spaces + "hostsfile.write('         ansible_host: ' + ip + '\\n');\n");
 
-# Add commands for playbook file to tempfile.py
-if(replacements_required >= 1):
-    tempfile.write(spaces + "playbookfile.write('- name: ' + devicename + '_pb\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  hosts: ' + devicename + '\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  vars:\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
+# Add commands to playbook file
+tempfile.write(spaces + "playbookfile.write('- name: ' + devicename + '_pb\\n');\n");
+tempfile.write(spaces + "playbookfile.write('  hosts: ' + devicename + '\\n');\n");
+tempfile.write(spaces + "playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
+tempfile.write(spaces + "playbookfile.write('  vars:\\n');\n");
+tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
+tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
 
-    # Add write and reload if desired
-    if hasattr(options, 'reload_in'):
-        mafunctions.reloadIn(tempfile,options.reload_in,spaces);
+# Add write and reload if desired
+if hasattr(options, 'reload_in'):
+    mafunctions.reloadIn(tempfile,options.reload_in,spaces);
 
-    # Add commands to tempfile.py
-    tempfile.write(spaces + "playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('      commands:\\n');\n");
+# Add commands to tempfile.py
+tempfile.write(spaces + "playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
+tempfile.write(spaces + "playbookfile.write('     " + options.cisco_product_line + ":\\n');\n");
+tempfile.write(spaces + "playbookfile.write('      commands:\\n');\n");
 
-    # Add commands for variable replacement
-    tempfile.write(spaces + "commandsfile = open('tmp/temptemplate.txt', 'r');\n");
-    tempfile.write(spaces + "for cmd in commandsfile:\n");
-    tempfile.write(spaces + "    repstr = cmd;\n");
+# Add commands for variable replacement
+tempfile.write(spaces + "if os.path.isfile('tmp/'+aclgroup+'/'+devicename+'.txt'):\n");
+tempfile.write(spaces + "    commandsfile = open('tmp/'+aclgroup+'/'+devicename+'.txt', 'r');\n");
+tempfile.write(spaces + "else:\n");
+tempfile.write(spaces + "    commandsfile = open('tmp/" + aclgroup + "/standard_template.txt', 'r');\n");
+tempfile.write(spaces + "for cmd in commandsfile:\n");
+tempfile.write(spaces + "    repstr = cmd;\n");
 
-    # Make replacements
-    for replacement in vars_used:
-        tempfile.write(spaces + "    repstr = repstr.replace('!"+replacement+"!', "+replacement+");\n");
-    tempfile.write(spaces + "    playbookfile.write('       - ' + repstr);\n");
+# Make replacements
+for replacement in vars_used:
+    tempfile.write(spaces + "    repstr = repstr.replace('!"+replacement+"!', "+replacement+");\n");
+tempfile.write(spaces + "    playbookfile.write('       - ' + repstr);\n");
 
-    # Make line between devices for easier reading.
-    tempfile.write(spaces + "playbookfile.write('\\n###############################################################\\n');\n");
+# Close commandsfile
+tempfile.write(spaces + "commandsfile.close();\n");
+
+# Make line between devices for easier reading.
+tempfile.write(spaces + "playbookfile.write('\\n###############################################################\\n');\n");
 
 # Add commands to tempfile.py to close all files.
 tempfile.write("\n");
 tempfile.write("inventoryfile.close();\n");
 tempfile.write("hostsfile.close();\n");
 tempfile.write("playbookfile.close();\n");
-tempfile.write("commandsfile.close();");
+# tempfile.write("standard_commandsfile.close();");
 
 # Close temp file
 tempfile.close();
@@ -309,6 +316,9 @@ tempfile.close();
 # Execute tempfile.py
 os.chmod("tmp/tempfile.py", 0o770);
 exec(open("tmp/tempfile.py").read());
+
+# Remove the aclgroups temp directory if it exists and recreate it
+shutil.rmtree("tmp/"+ aclgroup);
 
 confirm_ready = input("Your playbook and hosts file is ready.\n\nPlease open them in " + current_dir + ".\n\nMake sure the commands are the commands you intend to perform on your Cisco devices.\n\nPress ENTER when ready.");
 if(confirm_ready != ""):

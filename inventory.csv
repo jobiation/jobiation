@@ -1,4 +1,7 @@
 devicename,active,ip,location,model,arg1,arg2,arg3,arg4,arg5,tACL,tACL_dir,locallan1,dummycol
 skipline,active,ip,location,model,,,,,,,,,
 Jobiation1,1,192.168.254.226,field,C1111,,,1,,,1,in,10.1.1.0 0.0.0.31,
+Myrouter4,1,192.168.254.230,field,C1111,,,1,,,1,in,10.5.1.0 0.0.0.127,
+Myrouter1,1,192.168.254.228,field,C1111,,,1,,,1,in,10.3.1.0 0.0.0.63,
 Myrouter2,1,192.168.254.227,field,C1111,,,1,,,1,out,10.2.1.0 0.0.0.31,
+Myrouter3,1,192.168.254.229,field,C1111,,,1,,,1,in,10.4.1.0 0.0.0.127,
