@@ -70,7 +70,7 @@ replacements_required = 0;
 # Increment replacements_required variable and also validate the first line.
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
 for flCol in range(len(flList)-1):
-    if re.search("!"+flList[flCol], commands_content):
+    if re.search("!"+flList[flCol]+"!", commands_content):
         replacements_required = replacements_required+1;
     if not re.search(flAllowedChars, str(flList[flCol])):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
@@ -163,9 +163,9 @@ with open('../host_conditions.py', 'r') as hostcond_file:
 for flCol in range(len(flList)-1):
     if flList[flCol] in req_columns:
         tempfile.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n");
-        if re.search("!"+flList[flCol], commands_content):
+        if re.search("!"+flList[flCol]+"!", commands_content):
             vars_used.append(flList[flCol]);
-    elif re.search("!"+flList[flCol], commands_content):
+    elif re.search("!"+flList[flCol]+"!", commands_content):
         tempfile.write("        "+flList[flCol]+" = row["+str(flCol)+"];\n");
         vars_used.append(flList[flCol]);
     elif re.search("str\\(" + flList[flCol] + "\\)", hostcond_content):
@@ -211,7 +211,7 @@ if(replacements_required >= 1):
 
     # Make replacements
     for replacement in vars_used:
-        tempfile.write(spaces + "    repstr = repstr.replace('!"+replacement+"', "+replacement+");\n");
+        tempfile.write(spaces + "    repstr = repstr.replace('!"+replacement+"!', "+replacement+");\n");
     tempfile.write(spaces + "    playbookfile.write('       - ' + repstr);\n");
     tempfile.write(spaces + "playbookfile.write('\\n');\n");
 

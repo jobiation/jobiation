@@ -30,11 +30,3 @@ def cleanFile(cmdfile,cmds_to_remove):
                 if writeline == 1:
                     tempfile.write(line);
         os.replace('tmp/cleanfiletemp.txt',cmdfile);
-
-# def catFiles():
-#     filenames = ["scriptfiles/header.py", "scriptfiles/columns.py", "../host_conditions.py", "scriptfiles/footer.py", "scriptfiles/replacements.py"]
-#     with open("scriptfiles/compiled.py", "w") as new_file:
-#         for name in filenames:
-#             with open(name) as f:
-#                 for line in f:
-#                     new_file.write(line)

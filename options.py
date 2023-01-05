@@ -18,7 +18,10 @@ gather_facts = "no";
 ansible_command_timeout = "30";
 cisco_product_line = "cisco.ios.ios_command";
 
-# reload_in = 60; # This option is used with send_commands and manage_acls.
+### Uncomment the reload_in variable to begin your playbook with a write and reload command.
+### Set reload_in to 0 if you want to reload immediately or set reload_in to the number of minutes you want to delay the reload.
+### This option is used with send_commands and manage_acls.
+# reload_in = 60;
 
 ##################################################################################
 #############Send Commands Options###################################################
@@ -35,9 +38,6 @@ cisco_product_line = "cisco.ios.ios_command";
 ### Uncomment when_conditon ans specify a when statement you wish to 
 #when_condition = 'factsoutput["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and showcmd is search("ip name-server 192.168.254.254")';
 
-### Uncomment the reload_in variable to begin your playbook with a write and reload command.
-### Set reload_in to 0 if you want to reload immediately or set reload_in to the number of minutes you want to delay the reload.
-
 ##################################################################################
 #############Get Output Options###################################################
 ##################################################################################
@@ -49,10 +49,11 @@ commands_to_remove = {
   "showver":"Configuration (.*)0x2102$!!10 Gigabit Ethernet interfaces"
 };
 
-## Define the jobs exports in the following format:
-## directoryname : command
-## Note that each key must be unique.
+### Define the jobs exports in the following format:
+### directoryname : command
+### Note that each key must be unique.
 ### You can comment out individual exports but do not comment out the whole showcmd_exports dictionary
+### Make sure to leave off the trailing comma on the last item in the list.
 showcmd_exports = {
     "showrun":"show running-config",
     "showver":"show version"
@@ -95,10 +96,8 @@ aCLs = {
 ##### Tunnel ACLs
 "aclgroup":"tACL", #1 or 0
 "declaration":"ip access-list extended TunnelACL",
-"interfaces":"interface g0/0/0,interface TunnelACL 100",
+"interfaces":"interface g0/0/0,interface TunnelACL 100", # Specify a comma separated list of interfaces if more than one.
 "application":"ip access-group TunnelACL !tACL_dir!",
-# "preadd":1, # 1 or 0 - Important to include the name of the acl in the column in case more than one
-# "postadd":0, # 1 or 0 - Important to include the name of the acl in the column in case more than one
 "lastline":"deny ip any any log" # Can be column name or literal
 
 # ##### VTY ACl Example
