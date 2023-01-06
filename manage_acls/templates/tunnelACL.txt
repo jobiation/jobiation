@@ -1,0 +1,2 @@
+permit host !datalan! 10.18.0.0 0.0.255.255
+permit host !datalan! 10.9.0.0 0.0.15.255

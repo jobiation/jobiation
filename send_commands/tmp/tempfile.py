@@ -1,12 +1,9 @@
 #!/usr/bin/env python3
 import csv
-import sys
-import shutil
-import os
-hostsfile = open('jobs/20221227_1615/hosts', 'a+');
+hostsfile = open('jobs/20230105_2037/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
 commandsfile = open('commands.txt', 'r');
-playbookfile = open('jobs/20221227_1615/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20230105_2037/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 with inventoryfile as invfile:
     invdata = csv.reader(invfile)
@@ -14,8 +11,9 @@ with inventoryfile as invfile:
         devicename = row[0];
         active = row[1];
         ip = row[2];
-        arg1 = row[5];
-        arg3 = row[7];
+        arg1 = row[3];
+        arg3 = row[5];
+        datalan = row[8];
 # Note that 'continue' means skip.
 # Conditions must be casted as strings
 # Conditions form a logical AND
@@ -45,7 +43,8 @@ with inventoryfile as invfile:
         commandsfile = open('commands.txt', 'r');
         for cmd in commandsfile:
             repstr = cmd;
-            repstr = repstr.replace('!arg1', arg1);
+            repstr = repstr.replace('!arg1!', arg1);
+            repstr = repstr.replace('!datalan!', datalan);
             playbookfile.write('       - ' + repstr);
         playbookfile.write('\n');
         playbookfile.write('\n###############################################################\n');

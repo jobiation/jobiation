@@ -15,9 +15,10 @@ req_columns = [ "devicename", "ip", "active" ];
 # Import options file
 sys.path.insert(1, '../');
 import options
+import functions
 
-# Import send_command_functions
-import scfunctions
+# # Import send_command_functions
+# import scfunctions
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -121,12 +122,12 @@ if(replacements_required == 0):
     tempfile.write("playbookfile.write('  hosts: jobiation_inventory\\n');\n");
     tempfile.write("playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
     tempfile.write("playbookfile.write('  vars:\\n');\n");
-    tempfile.write("playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
+    tempfile.write("playbookfile.write('   ansible_command_timeout: "+str(options.ansible_command_timeout)+"\\n');\n");
     tempfile.write("playbookfile.write('  tasks:\\n');\n");
 
     # Add write and reload if desired
     if hasattr(options, 'reload_in'):
-        scfunctions.reloadIn(tempfile,options.reload_in,spaces);
+        functions.reloadIn(tempfile,options.reload_in,spaces);
 
     # Save facts if desired
     if hasattr(options, 'facts_module'):
@@ -184,12 +185,12 @@ if(replacements_required >= 1):
     tempfile.write(spaces + "playbookfile.write('  hosts: ' + devicename + '\\n');\n");
     tempfile.write(spaces + "playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
     tempfile.write(spaces + "playbookfile.write('  vars:\\n');\n");
-    tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
+    tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+str(options.ansible_command_timeout)+"\\n');\n");
     tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
 
     # Add write and reload if desired
     if hasattr(options, 'reload_in'):
-        scfunctions.reloadIn(tempfile,options.reload_in,spaces);
+        functions.reloadIn(tempfile,options.reload_in,spaces);
 
     # Save facts if desired
     if hasattr(options, 'facts_module'):

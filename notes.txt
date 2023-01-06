@@ -13,14 +13,13 @@ Figure out how to make the text editor open the playbook and hosts file.
 Finish validating options.py
 
 GET OUTPUT:
-Did you specify your search criteria?
 What column do you want to mark? (if not specified)
-Do you want to run search criteria against a backup?
-Find a string on one line and then another string within a specified number or range of subsequent lines.
 Process file from bottom up?
 
 ACLs
 ACL group? - If they type manual, ask them the manual group name. Mark column?
+
+
 
 #############################References########################################3
 

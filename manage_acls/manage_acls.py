@@ -16,6 +16,7 @@ req_columns = [ "devicename", "ip", "active" ];
 # Import options file
 sys.path.insert(1, '../');
 import options
+import functions
 
 # Import send_command_functions
 import mafunctions
@@ -35,9 +36,9 @@ else:
 # Copy hosts_header or check if username is needed in the options file
 password_prompt = " -k";
 
-if(options.use_hosts_header == 1):
+if(options.use_hosts_header == True):
     if not os.path.exists("../hosts_header"):
-        input("You need to put a hosts_header file in the jobiation root when you set the use_hosts_header to 1 in options.py.");
+        input("You need to put a hosts_header file in the jobiation root when you set the use_hosts_header to True in options.py.");
         sys.exit();
     shutil.copyfile("../hosts_header", current_dir + "/hosts");
     username = "NA";
@@ -171,7 +172,7 @@ for postadd in postadds:
 
 # Ask user if they want to do a write and reload
 if hasattr(options, 'reload_in'):
-    confirm_reload = input("ATTENTION! You have the reload_in option enabled.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue. ");
+    confirm_reload = input("ATTENTION! You have the reload_in option enabled.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue or press ENTER to cancel. ");
     if confirm_reload.lower() != "yes":
         print("Aborting!");
         sys.exit();
@@ -202,8 +203,8 @@ for flCol in range(len(flList)-1):
 
 spaces = "        ";
 
-# Build Hosts header if use_hosts_header == 0
-if(options.use_hosts_header == 0):
+# Build Hosts header if use_hosts_header == False
+if(options.use_hosts_header == False):
     hostsfile = open(current_dir+"/hosts","w");
     hostsfile.write("---\n");
     hostsfile.write("all:\n");   
@@ -211,7 +212,7 @@ if(options.use_hosts_header == 0):
     hostsfile.write("  ansible_python_interpreter: " + options.ansible_python_interpreter + "\n");
     hostsfile.write("  ansible_connection: " + options.ansible_connection + "\n");
     hostsfile.write("  ansible_network_os: " + options.ansible_network_os + "\n");
-    hostsfile.write("  ansible_port: " + options.ansible_port + "\n");
+    hostsfile.write("  ansible_port: " + str(options.ansible_port) + "\n");
     hostsfile.write("  ansible_user: " + username + "\n");
     hostsfile.write(" children:\n");
     hostsfile.write("   jobiation_inventory:\n");
@@ -272,11 +273,11 @@ tempfile.write(spaces + "playbookfile.write('- name: ' + devicename + '_pb\\n');
 tempfile.write(spaces + "playbookfile.write('  hosts: ' + devicename + '\\n');\n");
 tempfile.write(spaces + "playbookfile.write('  gather_facts: "+options.gather_facts+"\\n');\n");
 tempfile.write(spaces + "playbookfile.write('  vars:\\n');\n");
-tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+options.ansible_command_timeout+"\\n');\n");
+tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+str(options.ansible_command_timeout)+"\\n');\n");
 tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
 
 # Add write and reload if desired
-if hasattr(options, 'reload_in'):
+if hasattr(functions, 'reload_in'):
     mafunctions.reloadIn(tempfile,options.reload_in,spaces);
 
 # Add commands to tempfile.py
@@ -340,14 +341,14 @@ with open(current_dir + "/hosts", "w") as hosts:
     for hostsline in hostslines:
         matchuser = re.search('ansible_user', hostsline)
         matchpass = re.search('ansible_password', hostsline)
-        if matchuser and options.remove_username == 1:
+        if matchuser and options.remove_username == True:
             print("\n\nRemoving username from hosts file.\n\n");
-        elif matchpass and options.remove_password == 1:
+        elif matchpass and options.remove_password == True:
             print("\n\nRemoving password from hosts file.\n\n");
         else:
             hosts.write(hostsline);
 
 # Remove the hosts_header file if desired
-if(options.remove_hosts_header == 1):
+if(options.remove_hosts_header == True):
     if os.path.exists("../hosts_header"):
         os.remove("../hosts_header");

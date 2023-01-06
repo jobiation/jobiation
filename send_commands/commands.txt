@@ -1,4 +1,4 @@
 config t
-interface loopback !arg1
-!locallan
+interface loopback !arg1!
+ip address !datalan!
 end

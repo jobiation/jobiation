@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 import csv
 import os
-aclgroup = 'tACL';
-hostsfile = open('jobs/20221230_2107/hosts', 'a+');
+aclgroup = 'tunnelACL';
+hostsfile = open('jobs/20230105_2055/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
-playbookfile = open('jobs/20221230_2107/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20230105_2055/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 with inventoryfile as invfile:
     invdata = csv.reader(invfile)
@@ -12,9 +12,9 @@ with inventoryfile as invfile:
         devicename = row[0];
         active = row[1];
         ip = row[2];
-        arg3 = row[7];
-        tACL_dir = row[11];
-        locallan1 = row[12];
+        arg3 = row[5];
+        TunnelACL_dir = row[7];
+        datalan = row[8];
 # Note that 'continue' means skip.
 # Conditions must be casted as strings
 # Conditions form a logical AND
@@ -44,11 +44,11 @@ with inventoryfile as invfile:
         if os.path.isfile('tmp/'+aclgroup+'/'+devicename+'.txt'):
             commandsfile = open('tmp/'+aclgroup+'/'+devicename+'.txt', 'r');
         else:
-            commandsfile = open('tmp/tACL/standard_template.txt', 'r');
+            commandsfile = open('tmp/tunnelACL/standard_template.txt', 'r');
         for cmd in commandsfile:
             repstr = cmd;
-            repstr = repstr.replace('!tACL_dir!', tACL_dir);
-            repstr = repstr.replace('!locallan1!', locallan1);
+            repstr = repstr.replace('!TunnelACL_dir!', TunnelACL_dir);
+            repstr = repstr.replace('!datalan!', datalan);
             playbookfile.write('       - ' + repstr);
         commandsfile.close();
         playbookfile.write('\n###############################################################\n');
