@@ -19,6 +19,8 @@ ACLs
 ACL group? - If they type manual, ask them the manual group name. Mark column?
 
 If a job is aborted, delete current_dir
+Clean files in tmp
+Are python dictionaries keys called keys
 
 #############################References########################################3
 
@@ -46,3 +48,23 @@ literal strings
 r is raw string
 know what kind of line endings you have
 """
+
+////////////////////////////////////////////////////////////////////////
+
+##################################################################################
+#############Input Validation#####################################################
+##################################################################################
+
+# boolreg =re.compile("^[0-1]$");
+# numericreg =re.compile("^[0-9]$");
+# alphanumericreg =re.compile("^([0-9]?[a-z]?[A-Z]?){1,20}$");
+
+# remove_username_match = re.search(boolreg, str(remove_username))
+# if not remove_username_match:
+#   print("remove_username variable invalid. Change value in options.py.");
+#   sys.exit();
+
+# use_hosts_header_match = re.search(boolreg, str(use_hosts_header))
+# if not use_hosts_header_match:
+#   print("use_hosts_header variable invalid. Change value in options.py.");
+#   sys.exit();

@@ -1,0 +1,7 @@
+---
+- name: jobiation_pb
+  hosts: jobiation_inventory
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:

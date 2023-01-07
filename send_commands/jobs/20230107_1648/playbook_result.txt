@@ -1,0 +1,15 @@
+
+PLAY [Jobiation1_pb] ***********************************************************
+
+TASK [Jobiation1_commands] *****************************************************
+ok: [Jobiation1]
+
+PLAY [Myrouter4_pb] ************************************************************
+
+TASK [Myrouter4_commands] ******************************************************
+fatal: [Myrouter4]: FAILED! => {"changed": false, "msg": "[Errno None] Unable to connect to port 22 on 192.168.254.230"}
+
+PLAY RECAP *********************************************************************
+Jobiation1                 : ok=1    changed=0    unreachable=0    failed=0    skipped=0    rescued=0    ignored=0   
+Myrouter4                  : ok=0    changed=0    unreachable=0    failed=1    skipped=0    rescued=0    ignored=0   
+

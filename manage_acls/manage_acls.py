@@ -1,11 +1,11 @@
 #!/usr/bin/env python3
 
 # Imports
-import sys # For exiting the script early with sys.exit();
-import shutil # For copyfile
-import os # For mkdir
+import sys
+import shutil
+import os
 from datetime import datetime
-import subprocess # For running a bash script
+import subprocess
 import re
 import pathlib
 import os
@@ -25,6 +25,7 @@ date_time = now.strftime("%Y%m%d_%H%M");
 # # Make a directory for the job
 if os.path.isdir('jobs/' + date_time):
     print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
+    sys.exit();
 else:
     os.mkdir('jobs/' + date_time);
     current_dir = "jobs/" + date_time;
@@ -193,16 +194,8 @@ with open("tmp/"+ aclgroup +"/standard_template.txt", "r") as acl_temp:
     acl_template = acl_temp.read();
 acl_temp.close();
 
-# open inventory.csv
-inventoryfile = open("../inventory.csv","r");
-
-# Make a list of the first line
-with inventoryfile as invrow:
-    firstline = invrow.readline()
-flList = firstline.split(",");
-
-# Close the inventory file
-inventoryfile.close();
+# Make a list of the first line columns of inventory.csv
+flList = functions.getFirstLine(open("../inventory.csv","r"));
 
 # Validate the first line.
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
@@ -331,9 +324,9 @@ exec(open("tmp/tempfile.py").read());
 # Remove the aclgroups temp directory if it exists and recreate it
 shutil.rmtree("tmp/"+ aclgroup);
 
-confirm_ready = input("Your playbook and hosts file is ready.\n\nPlease open them in " + current_dir + ".\n\nMake sure the commands are the commands you intend to perform on your Cisco devices.\n\nPress ENTER when ready.");
+confirm_ready = input("\n\n-- Your playbook and hosts file is ready.\n\n-- Please open them in " + current_dir + ".\n\n-- Make sure the commands are the commands you intend to perform on your Cisco devices.\n\n-- Press ENTER when ready or type quit.\n\n");
 if(confirm_ready != ""):
-    print("Aborting!");
+    print("\nAborting!\n");
     sys.exit();
 
 # Create an run BASH script to run the playbook.

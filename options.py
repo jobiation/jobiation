@@ -1,6 +1,4 @@
 #!/usr/bin/env python3
-import re
-import sys
 
 #####################################################################################
 #############Global Options##########################################################
@@ -11,7 +9,7 @@ ansible_python_interpreter = "/usr/bin/python3";
 ansible_connection = "network_cli";
 ansible_network_os = "ios";
 ansible_port = 22;
-ansible_user = "jobiation";
+ansible_user = "";
 use_hosts_header = True;
 remove_hosts_header = False;
 remove_username = False;
@@ -57,8 +55,8 @@ cisco_product_line = "cisco.ios.ios_command";
 ### Make sure to leave off the trailing comma on the last item in the list.
 ### Keep the keys alphanumeric and under 15 characters. First character should be a lower case letter.
 showcmd_exports = {
-    "sh8W_run_":"show running-config"
-    # "show_ver":"show version"
+    # "showrun":"show running-config",
+    # "showver":"show version",
     # "showint":"show int status"
     };
 
@@ -71,8 +69,8 @@ showcmd_exports = {
 ### Make sure to leave off the trailing comma on the last item in the list.
 ### All dictionary keys must match a key in the showcmd_exports dictionary.
 commands_to_remove = {
-  "sh8W_run_":"enable secret!!username!!pre-shared-key"
-  # "show_ver":"Configuration (.*)0x2102$"
+  # "showrun":"enable secret!!username!!pre-shared-key",
+  # "showver":"Configuration (.*)0x2102$"
 };
 
 #####################################################################################
@@ -81,8 +79,7 @@ commands_to_remove = {
 
 ### Define search objects. This is optional.
 ### You can write your search criteria stored in variables here and then reference the variables in the searches dictionary.
-### You can also not define any variables in this section and specify your search criteria in the searches dictionary.
-my_search_object = "17.3.4";
+# iosversion = "17.3.4";
 
 ### Define your searches in the following format:
 ### columnname : directoryname!!searchcriteria
@@ -90,10 +87,10 @@ my_search_object = "17.3.4";
 ### Make sure to leave off the trailing comma on the last item in the list.
 ### Keep the keys alphanumeric and under 15 characters.
 searches = {
-    "has_ntp":"sh8W_run_!!ip address 192.168.254.",
-    "has_tacacs":"sh8W_run_!!ip tacacs server isetacacs",
-    "has8interfaces":"sh8W_run_!!interface GigabitEthernet0/1/7"
-    # "needs_upgrade":"showver!!"+my_search_object,
+    # "has_ntp":"showrun!!ip ntp server 192.168.254.50",
+    # "has_tacacs":"showrun!!ip tacacs server mytacacs",
+    # "has8interfaces":"showrun!!interface GigabitEthernet0/1/7",
+    # "needs_upgrade":"showver!!"+iosversion
     };
 
 
@@ -128,21 +125,3 @@ aCLs = {
 # "lastline":"deny ip any any"
 
 }
-
-##################################################################################
-#############Input Validation#####################################################
-##################################################################################
-
-# boolreg =re.compile("^[0-1]$");
-# numericreg =re.compile("^[0-9]$");
-# alphanumericreg =re.compile("^([0-9]?[a-z]?[A-Z]?){1,20}$");
-
-# remove_username_match = re.search(boolreg, str(remove_username))
-# if not remove_username_match:
-#   print("remove_username variable invalid. Change value in options.py.");
-#   sys.exit();
-
-# use_hosts_header_match = re.search(boolreg, str(use_hosts_header))
-# if not use_hosts_header_match:
-#   print("use_hosts_header variable invalid. Change value in options.py.");
-#   sys.exit();

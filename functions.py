@@ -20,3 +20,9 @@ def abortPlaybook(current_dir,message):
     print(message);
     shutil.rmtree(current_dir);
     sys.exit();
+
+def getFirstLine(inventoryfile):
+    with inventoryfile as invrow:
+        firstline = invrow.readline();
+    inventoryfile.close();
+    return firstline.split(",");

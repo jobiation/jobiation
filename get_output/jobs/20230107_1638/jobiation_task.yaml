@@ -1,0 +1,13 @@
+---
+- name: jobiation_pb
+  hosts: jobiation_inventory
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: showrun
+     cisco.ios.ios_command:
+       commands: show running-config
+     register: showrun
+   - name: copy_output_to_file
+     copy: content="{{ showrun.stdout[0] }}" dest="jobs/20230107_1638/showrun/{{ inventory_hostname }}_showrun.txt"

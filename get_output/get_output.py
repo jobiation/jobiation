@@ -1,35 +1,27 @@
 #!/usr/bin/env python3
 
 # Imports
-import sys # For exiting the script early with sys.exit();
-import shutil # For copyfile
-import os # For mkdir
-from datetime import datetime
-import subprocess # For running a bash script
-import re
-import pathlib
+import sys;
+import shutil;
+import os;
+from datetime import datetime;
+import subprocess;
+import re;
+import pathlib;
 
 # Make list of required columns
 req_columns = [ "devicename", "ip", "active" ];
 
-# Import options file
+# Import options and functions modules
 sys.path.insert(1, '../');
-import options
-import functions
+import options;
+import functions;
 
-# Import gofunctions file
-import gofunctions
+# Import gofunctions modules
+import gofunctions;
 
-# open inventory.csv
-inventoryfile = open("../inventory.csv","r");
-
-# Make a list of the first line
-with inventoryfile as invrow:
-    firstline = invrow.readline();
-flList = firstline.split(",");
-
-# Close the inventory file
-inventoryfile.close();
+# Make a list of the first line columns of inventory.csv
+flList = functions.getFirstLine(open("../inventory.csv","r"));
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -38,6 +30,7 @@ date_time = now.strftime("%Y%m%d_%H%M");
 # # Make a directory for the job
 if os.path.isdir('jobs/' + date_time):
     print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
+    sys.exit();
 else:
     os.mkdir('jobs/' + date_time);
     current_dir = "jobs/" + date_time;
@@ -75,7 +68,7 @@ else:
     username = options.ansible_user;
 
 # Validate the first line of inventory.csv
-flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,12}$");
+flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,14}$");
 for flCol in range(len(flList)-1):
     if not re.search(flAllowedChars, str(flList[flCol])):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
@@ -131,13 +124,12 @@ dictAllowedChars =re.compile("^[a-z]([a-z]?[A-Z]?[0-9]?_?){1,14}$");
 if len(options.showcmd_exports) >= 1:
     for subdir in options.showcmd_exports:
         if re.search(dictAllowedChars, subdir):
-            print(subdir+" matches");
             os.mkdir(current_dir+"/"+subdir);
             gofunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd_exports[subdir],subdir,current_dir);
         else:
             functions.abortPlaybook(current_dir,"Please only use letters, numbers, and underscores for the keys of the searches dictionary. Keep it under 15 characters. The first character should be a lower case letter.");
 
-
+# Add loop through inventory to tempfile
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
 tempfile.write("    for row in invdata:\n");
@@ -145,6 +137,7 @@ tempfile.write("    for row in invdata:\n");
 # Open host_conditions.py and cache in variable hostcond_content
 with open('../host_conditions.py', 'r') as hostcond_file:
     hostcond_content = hostcond_file.read();
+hostcond_file.close();
 
 # Add required columns and columns used in host_conditions.py
 for flCol in range(len(flList)-1):
@@ -173,9 +166,9 @@ tempfile.close();
 os.chmod("tmp/tempfile.py", 0o770);
 exec(open("tmp/tempfile.py").read());
 
-confirm_ready = input("-- Your playbook and hosts file is ready.\n\n-- Please open them in " + current_dir + ".\n\n-- Make sure the commands are the commands you intend to perform on your Cisco devices.\n\n-- Press ENTER when ready.");
+confirm_ready = input("\n\n-- Your playbook and hosts file is ready.\n\n-- Please open them in " + current_dir + ".\n\n-- Make sure the commands are the commands you intend to perform on your Cisco devices.\n\n-- Press ENTER when ready or type quit.\n\n");
 if(confirm_ready != ""):
-    print("Aborting!");
+    print("\nAborting!\n");
     sys.exit();
 
 # Create an run BASH script to run the playbook.
@@ -189,6 +182,7 @@ subprocess.call("tmp/runplaybook.sh");
 # # Remove username and password if desired
 with open(current_dir + "/hosts", "r") as hosts:
     hostslines = hosts.readlines();
+hosts.close();
 with open(current_dir + "/hosts", "w") as hosts:
     for hostsline in hostslines:
         matchuser = re.search('ansible_user', hostsline)
@@ -199,6 +193,7 @@ with open(current_dir + "/hosts", "w") as hosts:
             print("\n\nRemoving password from hosts file.\n\n");
         else:
             hosts.write(hostsline);
+hosts.close();
 
 # Remove the hosts_header file if desired
 if(options.remove_hosts_header == True):

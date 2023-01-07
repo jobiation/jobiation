@@ -22,7 +22,7 @@ jobs_dir = pathlib.Path("jobs").iterdir();
 for dir in jobs_dir:
     dirs.append(str(dir));
 if len(dirs) == 0:
-    print("There are no jobs to search. Please run get_output so there will be some output to search.");
+    print("\nThere are no jobs to search. Please run get_output so there will be some output to search.\n");
     sys.exit();
 dirs_count = 0;
 dirs.sort(reverse=True);
@@ -30,7 +30,7 @@ for dir in dirs:
     dirs_count = dirs_count + 1;
     if dirs_count <= 5:
         print("[" + str(dirs.index(dir)) + "]" + dir);
-dir_choice = input("Type the number of the directory you want to search: ");
+dir_choice = input("\nType the number of the directory you want to search: ");
 current_dir = str(dirs[int(dir_choice)]);
 
 # Declare hosts list

@@ -1,3 +1,0 @@
-Add post and pre adds
-
-Make is so you have to surround variables in !

@@ -30,3 +30,5 @@ def cleanFile(cmdfile,cmds_to_remove):
                 if writeline == 1:
                     tempfile.write(line);
         os.replace('tmp/cleanfiletemp.txt',cmdfile);
+        tempfile.close();
+    srcfile.close();

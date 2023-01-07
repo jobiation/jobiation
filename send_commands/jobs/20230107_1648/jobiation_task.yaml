@@ -1,0 +1,71 @@
+---
+- name: Jobiation1_pb
+  hosts: Jobiation1
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Jobiation1_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - interface loopback 1
+       - end
+
+###############################################################
+- name: Myrouter4_pb
+  hosts: Myrouter4
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Myrouter4_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - interface loopback 2
+       - end
+
+###############################################################
+- name: Myrouter1_pb
+  hosts: Myrouter1
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Myrouter1_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - interface loopback 3
+       - end
+
+###############################################################
+- name: Myrouter2_pb
+  hosts: Myrouter2
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Myrouter2_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - interface loopback 4
+       - end
+
+###############################################################
+- name: Myrouter3_pb
+  hosts: Myrouter3
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Myrouter3_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - interface loopback 5
+       - end
+
+###############################################################
