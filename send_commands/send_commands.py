@@ -24,8 +24,11 @@ now = datetime.now() # current date and time
 date_time = now.strftime("%Y%m%d_%H%M");
 
 # # Make a directory for the job
-os.mkdir('jobs/' + date_time);
-current_dir = "jobs/" + date_time;
+if os.path.isdir('jobs/' + date_time):
+    print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
+else:
+    os.mkdir('jobs/' + date_time);
+    current_dir = "jobs/" + date_time;
 
 # Copy hosts_header or check if username is needed in the options file
 password_prompt = " -k";
@@ -52,6 +55,7 @@ if hasattr(options, 'reload_in'):
 # Open commands.txt and cache in variable commands_content
 with open('commands.txt', 'r') as commands_file:
     commands_content = commands_file.read();
+commands_file.close();
 
 # open inventory.csv
 inventoryfile = open("../inventory.csv","r");
@@ -76,11 +80,11 @@ for flCol in range(len(flList)-1):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
         sys.exit();
 
-# Make spaces variable
-# if replacements_required == 0:
-#     spaces = "";
-# else:
-spaces = "        ";
+#Make spaces variable
+if replacements_required == 0:
+    spaces = "";
+else:
+    spaces = "        ";
 
 # Build Hosts header if use_hosts_header == False
 if(options.use_hosts_header == False):
@@ -104,9 +108,6 @@ tempfile = open("tmp/tempfile.py","w");
 # Add shebang and imports to tempfile.py
 tempfile.write("#!/usr/bin/env python3\n");
 tempfile.write("import csv\n");
-# tempfile.write("import sys\n");
-# tempfile.write("import shutil\n");
-# tempfile.write("import os\n");
 
 # Open files in tempfile.py
 tempfile.write("hostsfile = open('" + current_dir + "/hosts', 'a+');\n");
@@ -158,6 +159,7 @@ vars_used = [];
 # Open host_conditions.py and cache in variable hostcond_content
 with open('../host_conditions.py', 'r') as hostcond_file:
     hostcond_content = hostcond_file.read();
+hostcond_file.close();
 
 # Add required columns, columns used in host_conditions.py, and columns used in commands.txt to tempfile.py
 for flCol in range(len(flList)-1):
@@ -252,6 +254,7 @@ subprocess.call("tmp/runplaybook.sh");
 # # Remove username and password if desired
 with open(current_dir + "/hosts", "r") as hosts:
     hostslines = hosts.readlines();
+hosts.close();
 with open(current_dir + "/hosts", "w") as hosts:
     for hostsline in hostslines:
         matchuser = re.search('ansible_user', hostsline)
@@ -262,6 +265,7 @@ with open(current_dir + "/hosts", "w") as hosts:
             print("\n\nRemoving password from hosts file.\n\n");
         else:
             hosts.write(hostsline);
+hosts.close();
 
 # Remove the hosts_header file if desired
 if(options.remove_hosts_header == True):

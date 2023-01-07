@@ -2,9 +2,9 @@
 import csv
 import os
 aclgroup = 'tunnelACL';
-hostsfile = open('jobs/20230105_2055/hosts', 'a+');
+hostsfile = open('jobs/20230106_2125/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
-playbookfile = open('jobs/20230105_2055/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20230106_2125/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 with inventoryfile as invfile:
     invdata = csv.reader(invfile)

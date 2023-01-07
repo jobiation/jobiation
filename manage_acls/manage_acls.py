@@ -13,13 +13,10 @@ import os
 # Make array of required columns
 req_columns = [ "devicename", "ip", "active" ];
 
-# Import options file
+# Import options and functions files
 sys.path.insert(1, '../');
 import options
 import functions
-
-# Import send_command_functions
-import mafunctions
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -31,7 +28,6 @@ if os.path.isdir('jobs/' + date_time):
 else:
     os.mkdir('jobs/' + date_time);
     current_dir = "jobs/" + date_time;
-
 
 # Copy hosts_header or check if username is needed in the options file
 password_prompt = " -k";
@@ -84,6 +80,10 @@ for int in intList:
     standard_template.write(int + "\n");
     standard_template.write(application +"\n");
 
+# Get back to priv exec and write
+standard_template.write("end\n");
+standard_template.write("write\n");
+
 # Close the temp file
 standard_template.close();
 
@@ -112,7 +112,7 @@ for preadd in preadds:
     # Read chosen template into temp file
     preadd_template.write(acl_template_content);
 
-    # Check if post add exists for the same host
+    # Check if postadd exists for the same host
     if os.path.isfile("templates/"+aclgroup+"/postadds/"+hostname):
         with open("templates/"+aclgroup+"/postadds/"+hostname, 'r') as postadd_as:
             postadd_content = postadd_as.read();
@@ -127,10 +127,14 @@ for preadd in preadds:
         preadd_template.write(int + "\n");
         preadd_template.write(application +"\n");
 
+    # Get back to priv exec and write
+    preadd_template.write("end\n");
+    preadd_template.write("write\n");
+
     # Close the temp file
     preadd_template.close();
 
-# Make template file for hosts that have only preadd or pre and postadd.
+# Make template file for hosts that have only postadd.
 postadds = pathlib.Path("templates/"+aclgroup+"/postadds").iterdir();
 
 for postadd in postadds:
@@ -166,6 +170,10 @@ for postadd in postadds:
         for int in intList:
             postadd_template.write(int + "\n");
             postadd_template.write(application +"\n");
+        
+        # Get back to priv exec and write
+        postadd_template.write("end\n");
+        postadd_template.write("write\n");
 
         # Close the temp file
         postadd_template.close();
@@ -180,6 +188,7 @@ if hasattr(options, 'reload_in'):
 # Open acl template and cache in variable acl_template
 with open("tmp/"+ aclgroup +"/standard_template.txt", "r") as acl_temp:
     acl_template = acl_temp.read();
+acl_temp.close();
 
 # open inventory.csv
 inventoryfile = open("../inventory.csv","r");
@@ -195,8 +204,6 @@ inventoryfile.close();
 # Validate the first line.
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
 for flCol in range(len(flList)-1):
-    # if re.search("!"+flList[flCol]+"!", acl_template):
-    #     replacements_required = replacements_required+1;
     if not re.search(flAllowedChars, str(flList[flCol])):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
         sys.exit();
@@ -237,6 +244,7 @@ tempfile.write("inventoryfile = open('../inventory.csv', 'r');\n");
 tempfile.write("playbookfile = open('" + current_dir + "/jobiation_task.yaml', 'w');\n");
 tempfile.write("playbookfile.write('---\\n');\n");
 
+# Interate through inventory file
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
 tempfile.write("    for row in invdata:\n");
@@ -278,7 +286,7 @@ tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
 
 # Add write and reload if desired
 if hasattr(functions, 'reload_in'):
-    mafunctions.reloadIn(tempfile,options.reload_in,spaces);
+    functions.reloadIn(tempfile,options.reload_in,spaces);
 
 # Add commands to tempfile.py
 tempfile.write(spaces + "playbookfile.write('   - name: ' + devicename + '_commands\\n');\n");
@@ -309,7 +317,6 @@ tempfile.write("\n");
 tempfile.write("inventoryfile.close();\n");
 tempfile.write("hostsfile.close();\n");
 tempfile.write("playbookfile.close();\n");
-# tempfile.write("standard_commandsfile.close();");
 
 # Close temp file
 tempfile.close();
@@ -337,6 +344,7 @@ subprocess.call("tmp/runplaybook.sh");
 # # Remove username and password if desired
 with open(current_dir + "/hosts", "r") as hosts:
     hostslines = hosts.readlines();
+hosts.close();
 with open(current_dir + "/hosts", "w") as hosts:
     for hostsline in hostslines:
         matchuser = re.search('ansible_user', hostsline)
@@ -347,6 +355,7 @@ with open(current_dir + "/hosts", "w") as hosts:
             print("\n\nRemoving password from hosts file.\n\n");
         else:
             hosts.write(hostsline);
+hosts.close();
 
 # Remove the hosts_header file if desired
 if(options.remove_hosts_header == True):

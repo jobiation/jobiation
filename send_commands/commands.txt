@@ -1,4 +1,3 @@
 config t
-interface loopback !arg1!
-ip address !datalan!
+interface loopback 1
 end

@@ -35,8 +35,11 @@ now = datetime.now() # current date and time
 date_time = now.strftime("%Y%m%d_%H%M");
 
 # # Make a directory for the job
-current_dir = "jobs/" + date_time;
-os.mkdir(current_dir);
+if os.path.isdir('jobs/' + date_time):
+    print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
+else:
+    os.mkdir('jobs/' + date_time);
+    current_dir = "jobs/" + date_time;
 
 # Declare variables from options files
 facts_export = 0;
@@ -121,9 +124,6 @@ tempfile.write("playbookfile.write('  tasks:\\n');\n");
 if hasattr(options, 'facts_export'):
     os.mkdir(current_dir+"/facts");
     gofunctions.saveFacts(tempfile,options.facts_export,current_dir);
-
-# # Declare dirs[] list
-# dirs = [];
 
 # save output from show command if desired.
 if len(options.showcmd_exports) >= 1:
