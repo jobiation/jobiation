@@ -5,10 +5,12 @@ import sys # For exiting the script early with sys.exit();
 from datetime import datetime
 import re
 import pathlib
+import os
 
 # Import options file
 sys.path.insert(1, '../');
 import options
+import functions
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -56,25 +58,34 @@ for host in hostsfile:
 hostsfile.close();
 
 # Iterate searches[]
+dictAllowedChars =re.compile("^[a-z]([a-z]?[A-Z]?[0-9]?_?){1,14}$");
 for search in options.searches:
-    searchinfo = options.searches[search].split("!!");
-    searchdir = searchinfo[0];
-    searchdetail = searchinfo[1];
+    if re.search(dictAllowedChars, search):
+        searchinfo = options.searches[search].split("!!");
+        searchdir = searchinfo[0];
+        searchdetail = searchinfo[1];
+    else:
+        functions.abortPlaybook(current_dir,"Please only use letters, numbers, and underscores for the keys of the searches dictionary. Keep it under 15 characters. The first character should be a lower case letter.");
+
 
     fileList[0] = fileList[0]+search+",";
 
     #Iterate hosts[]
     for host in hosts:
-        with open(current_dir+'/'+searchdir+'/'+host+'_'+searchdir+'.txt', 'r') as outputfile:
-            content = outputfile.read();
-        match = re.search(searchdetail, content)
-        if match:
-            fileList[hosts.index(host)+1] = fileList[hosts.index(host)+1]+"1,";
+        if os.path.isfile(current_dir+'/'+searchdir+'/'+host+'_'+searchdir+'.txt'):
+            with open(current_dir+'/'+searchdir+'/'+host+'_'+searchdir+'.txt', 'r') as outputfile:
+                content = outputfile.read();
+            match = re.search(searchdetail, content)
+            if match:
+                fileList[hosts.index(host)+1] = fileList[hosts.index(host)+1]+"1,";
+            else:
+                fileList[hosts.index(host)+1] = fileList[hosts.index(host)+1]+"0,";
         else:
-            fileList[hosts.index(host)+1] = fileList[hosts.index(host)+1]+"0,";
+            fileList[hosts.index(host)+1] = fileList[hosts.index(host)+1]+"NA,";
+
 
 # Declare report file
-reportfile = open(current_dir+"/report.csv","w");
+reportfile = open(current_dir+"/report_"+date_time+".csv","w");
 
 # Populate report file
 for hostrecord in fileList:

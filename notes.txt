@@ -14,12 +14,11 @@ Finish validating options.py
 
 GET OUTPUT:
 What column do you want to mark? (if not specified)
-Process file from bottom up?
 
 ACLs
 ACL group? - If they type manual, ask them the manual group name. Mark column?
 
-
+If a job is aborted, delete current_dir
 
 #############################References########################################3
 

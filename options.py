@@ -22,10 +22,13 @@ gather_facts = "no";
 ansible_command_timeout = 30;
 cisco_product_line = "cisco.ios.ios_command";
 
-### Uncomment the reload_in variable to begin your playbook with a write and reload command.
+### Uncomment the reload_in variable to begin your playbook with the write and reload commands.
+### Uncommenting reload_in will also omit the write command at the end so your changes will not be saved.
+### Use this option if you think there is a small change your changes could lock you out of your devices, for example if you are editing a vty ACL.
+### If your commands see successful then use the send_commands script to  write the changes.
 ### Set reload_in to 0 if you want to reload immediately or set reload_in to the number of minutes you want to delay the reload.
-### This option is used with send_commands and manage_acls.
-reload_in = 60;
+### This option is used only with send_commands and manage_acls.
+# reload_in = 60;
 
 #####################################################################################
 #############Send Commands Options###################################################
@@ -52,22 +55,24 @@ reload_in = 60;
 ### Note that each key must be unique.
 ### You can comment out individual exports but do not comment out the whole showcmd_exports dictionary
 ### Make sure to leave off the trailing comma on the last item in the list.
+### Keep the keys alphanumeric and under 15 characters. First character should be a lower case letter.
 showcmd_exports = {
-    "showrun":"show running-config",
-    "showver":"show version"
+    "sh8W_run_":"show running-config"
+    # "show_ver":"show version"
     # "showint":"show int status"
     };
 
 ### If you wish to export facts, uncomment facts_export and define the facts module to use for the export.
-facts_export = "cisco.ios.ios_facts";
+# facts_export = "cisco.ios.ios_facts";
 
 ### If there are commands you would rather not store for security reasons, add them to the commands_to_remove list.
 ### Use the format "directoryname":"command_1!!command_2!!command_3,"
 ### You can comment out individual exports but do not comment out the whole commands_to_remove dictionary
 ### Make sure to leave off the trailing comma on the last item in the list.
+### All dictionary keys must match a key in the showcmd_exports dictionary.
 commands_to_remove = {
-  # "showrun":"enable secret!!username!!pre-shared-key",
-  # "showver":"Configuration (.*)0x2102$"
+  "sh8W_run_":"enable secret!!username!!pre-shared-key"
+  # "show_ver":"Configuration (.*)0x2102$"
 };
 
 #####################################################################################
@@ -83,11 +88,12 @@ my_search_object = "17.3.4";
 ### columnname : directoryname!!searchcriteria
 ### You can comment out individual exports but do not comment out the whole searches dictionary
 ### Make sure to leave off the trailing comma on the last item in the list.
+### Keep the keys alphanumeric and under 15 characters.
 searches = {
-    # "has_ntp":"showrun!!ntp server 10.1.1.1",
-    # "has_tacacs":"showrun!!ip tacacs server isetacacs",
+    "has_ntp":"sh8W_run_!!ip address 192.168.254.",
+    "has_tacacs":"sh8W_run_!!ip tacacs server isetacacs",
+    "has8interfaces":"sh8W_run_!!interface GigabitEthernet0/1/7"
     # "needs_upgrade":"showver!!"+my_search_object,
-    # "has8interfaces":"showrun!!interface GigabitEthernet0/0/7"
     };
 
 
@@ -103,6 +109,8 @@ searches = {
 ### "lastline":"last_line_of_acl"
 ### You can comment out individual exports but do not comment out the whole aCLs dictionary
 ### Make sure to leave off the trailing comma on the last item in the list.
+### Keep the keys alphanumeric and under 15 characters.
+
 aCLs = {
 
 # ##### Tunnel ACLs

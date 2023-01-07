@@ -15,6 +15,7 @@ req_columns = [ "devicename", "ip", "active" ];
 # Import options file
 sys.path.insert(1, '../');
 import options
+import functions
 
 # Import gofunctions file
 import gofunctions
@@ -74,7 +75,7 @@ else:
     username = options.ansible_user;
 
 # Validate the first line of inventory.csv
-flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
+flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,12}$");
 for flCol in range(len(flList)-1):
     if not re.search(flAllowedChars, str(flList[flCol])):
         print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
@@ -125,12 +126,17 @@ if hasattr(options, 'facts_export'):
     os.mkdir(current_dir+"/facts");
     gofunctions.saveFacts(tempfile,options.facts_export,current_dir);
 
-# save output from show command if desired.
+# save output from show command if desired and validate user defined dictionary
+dictAllowedChars =re.compile("^[a-z]([a-z]?[A-Z]?[0-9]?_?){1,14}$");
 if len(options.showcmd_exports) >= 1:
     for subdir in options.showcmd_exports:
-        os.mkdir(current_dir+"/"+subdir);
-        # dirs.append(subdir);
-        gofunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd_exports[subdir],subdir,current_dir);
+        if re.search(dictAllowedChars, subdir):
+            print(subdir+" matches");
+            os.mkdir(current_dir+"/"+subdir);
+            gofunctions.saveShowCmd(tempfile,options.cisco_product_line,options.showcmd_exports[subdir],subdir,current_dir);
+        else:
+            functions.abortPlaybook(current_dir,"Please only use letters, numbers, and underscores for the keys of the searches dictionary. Keep it under 15 characters. The first character should be a lower case letter.");
+
 
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
@@ -204,7 +210,8 @@ if(options.remove_hosts_header == True):
 dirs = options.commands_to_remove;
 
 for dir in dirs:
-    cmds_to_remove = str(dirs[dir]);
-    subdirlist = pathlib.Path(current_dir+"/"+dir).iterdir();
-    for cmdfile in subdirlist:
-        gofunctions.cleanFile(cmdfile,cmds_to_remove);
+    if re.search(dictAllowedChars, dir):
+        cmds_to_remove = str(dirs[dir]);
+        subdirlist = pathlib.Path(current_dir+"/"+dir).iterdir();
+        for cmdfile in subdirlist:
+            gofunctions.cleanFile(cmdfile,cmds_to_remove);

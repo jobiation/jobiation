@@ -81,8 +81,9 @@ for int in intList:
     standard_template.write(application +"\n");
 
 # Get back to priv exec and write
-standard_template.write("end\n");
-standard_template.write("write\n");
+if not hasattr(options, 'reload_in'):
+    standard_template.write("end\n");
+    standard_template.write("write\n");
 
 # Close the temp file
 standard_template.close();
@@ -128,8 +129,9 @@ for preadd in preadds:
         preadd_template.write(application +"\n");
 
     # Get back to priv exec and write
-    preadd_template.write("end\n");
-    preadd_template.write("write\n");
+    if not hasattr(options, 'reload_in'):
+        preadd_template.write("end\n");
+        preadd_template.write("write\n");
 
     # Close the temp file
     preadd_template.close();
@@ -172,8 +174,9 @@ for postadd in postadds:
             postadd_template.write(application +"\n");
         
         # Get back to priv exec and write
-        postadd_template.write("end\n");
-        postadd_template.write("write\n");
+        if not hasattr(options, 'reload_in'):
+            postadd_template.write("end\n");
+            postadd_template.write("write\n");
 
         # Close the temp file
         postadd_template.close();
@@ -285,7 +288,7 @@ tempfile.write(spaces + "playbookfile.write('   ansible_command_timeout: "+str(o
 tempfile.write(spaces + "playbookfile.write('  tasks:\\n');\n");
 
 # Add write and reload if desired
-if hasattr(functions, 'reload_in'):
+if hasattr(options, 'reload_in'):
     functions.reloadIn(tempfile,options.reload_in,spaces);
 
 # Add commands to tempfile.py

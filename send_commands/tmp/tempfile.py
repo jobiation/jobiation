@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 import csv
-hostsfile = open('jobs/20230106_2048/hosts', 'a+');
+hostsfile = open('jobs/20230107_0833/hosts', 'a+');
 inventoryfile = open('../inventory.csv', 'r');
 commandsfile = open('commands.txt', 'r');
-playbookfile = open('jobs/20230106_2048/jobiation_task.yaml', 'w');
+playbookfile = open('jobs/20230107_0833/jobiation_task.yaml', 'w');
 playbookfile.write('---\n');
 playbookfile.write('- name: jobiation_pb\n');
 playbookfile.write('  hosts: jobiation_inventory\n');

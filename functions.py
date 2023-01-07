@@ -1,5 +1,8 @@
 #!/usr/bin/emv python3
 
+import sys
+import shutil
+
 def reloadIn(tempfile,reload_in, spaces):
     tempfile.write(spaces+"playbookfile.write('   - name: Write\\n');\n");
     tempfile.write(spaces+"playbookfile.write('     cli_command:\\n');\n");
@@ -12,3 +15,8 @@ def reloadIn(tempfile,reload_in, spaces):
     tempfile.write(spaces+"playbookfile.write('         - \"Confirm\"\\n');\n");
     tempfile.write(spaces+"playbookfile.write('       answer:\\n');\n");
     tempfile.write(spaces+"playbookfile.write('         - \"y\"\\n');\n");
+
+def abortPlaybook(current_dir,message):
+    print(message);
+    shutil.rmtree(current_dir);
+    sys.exit();
