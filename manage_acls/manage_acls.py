@@ -236,7 +236,6 @@ tempfile.write("aclgroup = '"+ aclgroup +"';\n");
 # Open files in tempfile.py
 tempfile.write("hostsfile = open('" + current_dir + "/hosts', 'a+');\n");
 tempfile.write("inventoryfile = open('../inventory.csv', 'r');\n");
-# tempfile.write("standard_commandsfile = open('tmp/" + aclgroup + "/standard_template.txt', 'r');\n");
 tempfile.write("playbookfile = open('" + current_dir + "/jobiation_task.yaml', 'w');\n");
 tempfile.write("playbookfile.write('---\\n');\n");
 

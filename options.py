@@ -13,7 +13,7 @@ ansible_user = "";
 use_hosts_header = True;
 remove_hosts_header = False;
 remove_username = False;
-remove_password = False;
+remove_password = True;
 
 # Playbook header options
 gather_facts = "no";
