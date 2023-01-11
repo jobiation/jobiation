@@ -1,7 +1,7 @@
 #!/usr/bin/emv python3
 
-import os
-import re
+import os;
+import re;
 
 def saveFacts(tempfile,facts_module,current_dir):
     tempfile.write("playbookfile.write('   - name: gather_facts\\n');\n");

@@ -1,20 +1,20 @@
 #!/usr/bin/env python3
 
 # Imports
-import sys
-import shutil
-import os
-from datetime import datetime
-import subprocess
-import re
+import sys;
+import shutil;
+import os;
+from datetime import datetime;
+import subprocess;
+import re;
 
 # Make array of required columns
 req_columns = [ "devicename", "ip", "active" ];
 
 # Import options and functions files
 sys.path.insert(1, '../');
-import options
-import functions
+import options;
+import functions;
 
 # Import send_command_functions
 import scfunctions
@@ -25,7 +25,7 @@ date_time = now.strftime("%Y%m%d_%H%M");
 
 # # Make a directory for the job
 if os.path.isdir('jobs/' + date_time):
-    print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
+    print("\nYou cannot run more than one job within the same minute. Please wait until the end of this minute and try again.\n");
     sys.exit();
 else:
     os.mkdir('jobs/' + date_time);
@@ -36,21 +36,23 @@ password_prompt = " -k";
 
 if(options.use_hosts_header == True):
     if not os.path.exists("../hosts_header"):
-        input("You need to put a hosts_header file in the jobiation root when you set the use_hosts_header to True in options.py.");
+        print("\nYou need to put a hosts_header file in the jobiation root when you set the use_hosts_header to True in options.py.\n");
+        shutil.rmtree(current_dir);
         sys.exit();
     shutil.copyfile("../hosts_header", current_dir + "/hosts");
     username = "NA";
     password_prompt = "";
 elif(options.ansible_user == ""):
-    username = input("You do not have a username set. What username do you want to use? ");
+    username = input("\nYou do not have a username set. What username do you want to use? ");
 else:
     username = options.ansible_user;
 
 # Ask user if they want to do a write and reload
 if hasattr(options, 'reload_in'):
-    confirm_reload = input("ATTENTION! You have the reload_in option enabled.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue. ");
+    confirm_reload = input("\n-- ATTENTION! You have the reload_in option enabled.\n\n-- Your specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\n-- Type 'yes' if you want to continue. ");
     if confirm_reload.lower() != "yes":
-        print("Aborting!");
+        print("\nAborting!\n");
+        shutil.rmtree(current_dir);
         sys.exit();
 
 # Open commands.txt and cache in variable commands_content
@@ -64,13 +66,14 @@ flList = functions.getFirstLine(open("../inventory.csv","r"));
 # Make flag variable for replacements
 replacements_required = 0;
 
-# Increment replacements_required variable and also validate the first line.
+# Increment replacements_required variable and also validate the first line of inventory.csv
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
 for flCol in range(len(flList)-1):
     if re.search("!"+flList[flCol]+"!", commands_content):
         replacements_required = replacements_required+1;
     if not re.search(flAllowedChars, str(flList[flCol])):
-        print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
+        print("\n"+flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.\n");
+        shutil.rmtree(current_dir);    
         sys.exit();
 
 #Make spaces variable
@@ -142,6 +145,7 @@ if(replacements_required == 0):
     if hasattr(options, 'when_condition'):
         tempfile.write("playbookfile.write('     when: " + options.when_condition + "\\n');\n");
 
+# Interate through inventory file
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
 tempfile.write("    for row in invdata:\n");
@@ -231,9 +235,11 @@ tempfile.close();
 os.chmod("tmp/tempfile.py", 0o770);
 exec(open("tmp/tempfile.py").read());
 
+# Confirm user is ready
 confirm_ready = input("\n\n-- Your playbook and hosts file is ready.\n\n-- Please open them in " + current_dir + ".\n\n-- Make sure the commands are the commands you intend to perform on your Cisco devices.\n\n-- Press ENTER when ready or type quit.\n\n");
 if(confirm_ready != ""):
     print("\nAborting!\n");
+    shutil.rmtree(current_dir);
     sys.exit();
 
 # Create an run BASH script to run the playbook.

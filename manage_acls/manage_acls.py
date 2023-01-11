@@ -1,22 +1,22 @@
 #!/usr/bin/env python3
 
 # Imports
-import sys
-import shutil
-import os
-from datetime import datetime
-import subprocess
-import re
-import pathlib
-import os
+import sys;
+import shutil;
+import os;
+from datetime import datetime;
+import subprocess;
+import re;
+import pathlib;
+import os;
 
 # Make array of required columns
 req_columns = [ "devicename", "ip", "active" ];
 
 # Import options and functions files
 sys.path.insert(1, '../');
-import options
-import functions
+import options;
+import functions;
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -24,7 +24,7 @@ date_time = now.strftime("%Y%m%d_%H%M");
 
 # # Make a directory for the job
 if os.path.isdir('jobs/' + date_time):
-    print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
+    print("\nYou cannot run more than one job within the same minute. Please wait until the end of this minute and try again.\n");
     sys.exit();
 else:
     os.mkdir('jobs/' + date_time);
@@ -35,13 +35,14 @@ password_prompt = " -k";
 
 if(options.use_hosts_header == True):
     if not os.path.exists("../hosts_header"):
-        input("You need to put a hosts_header file in the jobiation root when you set the use_hosts_header to True in options.py.");
+        input("\nYou need to put a hosts_header file in the jobiation root when you set the use_hosts_header to True in options.py.");
+        shutil.rmtree(current_dir);
         sys.exit();
     shutil.copyfile("../hosts_header", current_dir + "/hosts");
     username = "NA";
     password_prompt = "";
 elif(options.ansible_user == ""):
-    username = input("You do not have a username set. What username do you want to use? ");
+    username = input("\nYou do not have a username set. What username do you want to use? ");
 else:
     username = options.ansible_user;
 
@@ -60,7 +61,7 @@ os.mkdir("tmp/"+ aclgroup);
 # Declare temp file for ACL
 standard_template = open("tmp/" + aclgroup + "/standard_template.txt", "w");
 
-# Add commands to the temp file for removeing ACL from interfaces and redeclare ACL.
+# Add commands to the temp file for removeing ACLs from interfaces and redeclare ACL.
 for int in intList:
     standard_template.write(int + "\n");
     standard_template.write("no "+ application +"\n");
@@ -86,7 +87,7 @@ if not hasattr(options, 'reload_in'):
     standard_template.write("end\n");
     standard_template.write("write\n");
 
-# Close the temp file
+# Close the standard_template file
 standard_template.close();
 
 # Make template file for hosts that have only preadd or pre and postadd.
@@ -145,7 +146,7 @@ for postadd in postadds:
 
     # Check if template file was already created by the preadd block
     if os.path.isfile("tmp/"+aclgroup+"/"+hostname):
-        print("post add file already created for " + hostname);
+        print("");
     else:
         # Declare temp file for ACL
         postadd_template = open("tmp/"+aclgroup+"/"+hostname, "w");
@@ -184,9 +185,10 @@ for postadd in postadds:
 
 # Ask user if they want to do a write and reload
 if hasattr(options, 'reload_in'):
-    confirm_reload = input("ATTENTION! You have the reload_in option enabled.\n\nYour specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\nType 'yes' if you want to continue or press ENTER to cancel. ");
+    confirm_reload = input("\n-- ATTENTION! You have the reload_in option enabled.\n\n-- Your specified devices will be reloaded in " + str(options.reload_in) + " minutes.\n\n-- Type 'yes' if you want to continue. ");
     if confirm_reload.lower() != "yes":
-        print("Aborting!");
+        print("\nAborting!\n");
+        shutil.rmtree(current_dir);
         sys.exit();
 
 # Open acl template and cache in variable acl_template
@@ -197,13 +199,15 @@ acl_temp.close();
 # Make a list of the first line columns of inventory.csv
 flList = functions.getFirstLine(open("../inventory.csv","r"));
 
-# Validate the first line.
+# Validate the first line of inventory.csv
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,15}$");
 for flCol in range(len(flList)-1):
     if not re.search(flAllowedChars, str(flList[flCol])):
-        print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
+        print("\n"+flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.\n");
+        shutil.rmtree(current_dir);
         sys.exit();
 
+#Make spaces variable
 spaces = "        ";
 
 # Build Hosts header if use_hosts_header == False
@@ -320,12 +324,15 @@ tempfile.close();
 os.chmod("tmp/tempfile.py", 0o770);
 exec(open("tmp/tempfile.py").read());
 
-# Remove the aclgroups temp directory if it exists and recreate it
-shutil.rmtree("tmp/"+ aclgroup);
+# Remove the aclgroups temp directory.
+if os.path.isdir("tmp/"+ aclgroup):
+    shutil.rmtree("tmp/"+ aclgroup);
 
+# Confirm user is ready
 confirm_ready = input("\n\n-- Your playbook and hosts file is ready.\n\n-- Please open them in " + current_dir + ".\n\n-- Make sure the commands are the commands you intend to perform on your Cisco devices.\n\n-- Press ENTER when ready or type quit.\n\n");
 if(confirm_ready != ""):
     print("\nAborting!\n");
+    shutil.rmtree(current_dir);
     sys.exit();
 
 # Create an run BASH script to run the playbook.

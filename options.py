@@ -21,11 +21,11 @@ ansible_command_timeout = 30;
 cisco_product_line = "cisco.ios.ios_command";
 
 ### Uncomment the reload_in variable to begin your playbook with the write and reload commands.
-### Uncommenting reload_in will also omit the write command at the end so your changes will not be saved.
-### Use this option if you think there is a small change your changes could lock you out of your devices, for example if you are editing a vty ACL.
-### If your commands see successful then use the send_commands script to  write the changes.
+### If running manage_acls.py, uncommenting reload_in will also omit the write command at the end so your changes will not be saved.
+### Use this option if you think there is a small change your changes could lock you out of your devices, for example if you are editing a VTY ACL.
+### If your commands are successful, then use the send_commands script to  write the changes and cancel the reload.
 ### Set reload_in to 0 if you want to reload immediately or set reload_in to the number of minutes you want to delay the reload.
-### This option is used only with send_commands and manage_acls.
+### This option is used only with send_commands.py and manage_acls.py.
 # reload_in = 60;
 
 #####################################################################################
@@ -40,9 +40,10 @@ cisco_product_line = "cisco.ios.ios_command";
 ### In when condition statements you can reference the show command's output as 'showcmd'
 #showcmd = "show running-config";
 
-### Uncomment when_conditon ans specify a when statement you wish to
+### Uncomment when_conditon and specify a when statement
 ### Example when condition
-#when_condition = 'factsoutput["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and showcmd is search("ip name-server 192.168.254.254")';
+### when_condition = 'factsoutput["ansible_facts"]["ansible_net_interfaces"]["GigabitEthernet0/0/0"]["macaddress"] == "2436.daf2.dc00" and showcmd is search("ip name-server 192.168.254.254")';
+#when_condition = '';
 
 ##################################################################################
 #############Get Output Options###################################################
@@ -51,9 +52,9 @@ cisco_product_line = "cisco.ios.ios_command";
 ### Define the job exports in the following format:
 ### directoryname : command
 ### Note that each key must be unique.
-### You can comment out individual exports but do not comment out the whole showcmd_exports dictionary
-### Make sure to leave off the trailing comma on the last item in the list.
-### Keep the keys alphanumeric and under 15 characters. First character should be a lower case letter.
+### You can comment out individual exports, but do not comment out the whole showcmd_exports dictionary
+### Make sure to leave off the trailing comma on the last item in the dictionary.
+### Keep the keys alphanumeric with underscores and less than 15 characters. First character should be a lower case letter.
 showcmd_exports = {
     # "showrun":"show running-config",
     # "showver":"show version",
@@ -63,11 +64,12 @@ showcmd_exports = {
 ### If you wish to export facts, uncomment facts_export and define the facts module to use for the export.
 # facts_export = "cisco.ios.ios_facts";
 
-### If there are commands you would rather not store for security reasons, add them to the commands_to_remove list.
+### If there are commands you would rather not store for security reasons, add them to the commands_to_remove dictionary.
 ### Use the format "directoryname":"command_1!!command_2!!command_3,"
 ### You can comment out individual exports but do not comment out the whole commands_to_remove dictionary
 ### Make sure to leave off the trailing comma on the last item in the list.
 ### All dictionary keys must match a key in the showcmd_exports dictionary.
+### Keep the keys alphanumeric with underscores and less than 15 characters. First character should be a lower case letter.
 commands_to_remove = {
   # "showrun":"enable secret!!username!!pre-shared-key",
   # "showver":"Configuration (.*)0x2102$"
@@ -85,7 +87,7 @@ commands_to_remove = {
 ### columnname : directoryname!!searchcriteria
 ### You can comment out individual exports but do not comment out the whole searches dictionary
 ### Make sure to leave off the trailing comma on the last item in the list.
-### Keep the keys alphanumeric and under 15 characters.
+### Keep the keys alphanumeric with underscores and less than 15 characters. First character should be a lower case letter.
 searches = {
     # "has_ntp":"showrun!!ip ntp server 192.168.254.50",
     # "has_tacacs":"showrun!!ip tacacs server mytacacs",
@@ -106,7 +108,7 @@ searches = {
 ### "lastline":"last_line_of_acl"
 ### You can comment out individual exports but do not comment out the whole aCLs dictionary
 ### Make sure to leave off the trailing comma on the last item in the list.
-### Keep the keys alphanumeric and under 15 characters.
+### Keep the keys alphanumeric with underscores and less than 15 characters. First character should be a lower case letter.
 
 aCLs = {
 

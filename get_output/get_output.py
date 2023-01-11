@@ -20,6 +20,12 @@ import functions;
 # Import gofunctions modules
 import gofunctions;
 
+# Make sure required directories exist
+if not os.path.isdir('jobs'):
+    os.mkdir('jobs');
+if not os.path.isdir('tmp'):
+    os.mkdir('tmp');
+
 # Make a list of the first line columns of inventory.csv
 flList = functions.getFirstLine(open("../inventory.csv","r"));
 
@@ -29,7 +35,7 @@ date_time = now.strftime("%Y%m%d_%H%M");
 
 # # Make a directory for the job
 if os.path.isdir('jobs/' + date_time):
-    print("You cannot run more than one job within the same minute. Please wait until the end of this minute and try again.");
+    print("\nYou cannot run more than one job within the same minute. Please wait until the end of this minute and try again.\n");
     sys.exit();
 else:
     os.mkdir('jobs/' + date_time);
@@ -49,7 +55,8 @@ if len(options.showcmd_exports) >= 1:
 
 # Check if there is anything to do
 if facts_export == 0 and showcmd_exports == 0:
-    print("facts_export is not set and showcmd_exports is null so there is nothing to do. Please check options.py.");
+    print("\nfacts_export is not set and showcmd_exports is null so there is nothing to do. Please check options.py.\n");
+    shutil.rmtree(current_dir);
     sys.exit();
 
 # Copy hosts_header or check if username is needed in the options file
@@ -57,13 +64,14 @@ password_prompt = " -k";
 
 if(options.use_hosts_header == True):
     if not os.path.exists("../hosts_header"):
-        input("You need to put a hosts_header file in the jobiation root when you set the use_hosts_header to True in options.py.");
+        input("\nYou need to put a hosts_header file in the jobiation root when you set the use_hosts_header to True in options.py.\n");
+        shutil.rmtree(current_dir);
         sys.exit();
     shutil.copyfile("../hosts_header", current_dir + "/hosts");
     username = "NA";
     password_prompt = "";
 elif(options.ansible_user == ""):
-    username = input("You do not have a username set. What username do you want to use? ");
+    username = input("\nYou do not have a username set. What username do you want to use? ");
 else:
     username = options.ansible_user;
 
@@ -71,7 +79,8 @@ else:
 flAllowedChars =re.compile("^([0-9]?[a-z]?[A-Z]?_?){1,14}$");
 for flCol in range(len(flList)-1):
     if not re.search(flAllowedChars, str(flList[flCol])):
-        print(flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.");
+        print("\n"+flList[flCol] + " contains an illegal character.\n\nThe top line of the inventory can contain numbers, letters, and underscores.\n\nAlso, please do not use more than 15 characters in any one column header.\n");
+        shutil.rmtree(current_dir);
         sys.exit();
 
 # Build Hosts header if use_hosts_header == False
@@ -129,7 +138,7 @@ if len(options.showcmd_exports) >= 1:
         else:
             functions.abortPlaybook(current_dir,"Please only use letters, numbers, and underscores for the keys of the searches dictionary. Keep it under 15 characters. The first character should be a lower case letter.");
 
-# Add loop through inventory to tempfile
+# Interate through inventory file
 tempfile.write("with inventoryfile as invfile:\n");
 tempfile.write("    invdata = csv.reader(invfile)\n");
 tempfile.write("    for row in invdata:\n");
@@ -166,9 +175,11 @@ tempfile.close();
 os.chmod("tmp/tempfile.py", 0o770);
 exec(open("tmp/tempfile.py").read());
 
+# Confirm user is ready
 confirm_ready = input("\n\n-- Your playbook and hosts file is ready.\n\n-- Please open them in " + current_dir + ".\n\n-- Make sure the commands are the commands you intend to perform on your Cisco devices.\n\n-- Press ENTER when ready or type quit.\n\n");
 if(confirm_ready != ""):
     print("\nAborting!\n");
+    shutil.rmtree(current_dir);
     sys.exit();
 
 # Create an run BASH script to run the playbook.
@@ -200,8 +211,7 @@ if(options.remove_hosts_header == True):
     if os.path.exists("../hosts_header"):
         os.remove("../hosts_header");
 
-##################################Remove Sensitive Data##############################################
-
+# Remove sensitive data
 dirs = options.commands_to_remove;
 
 for dir in dirs:

@@ -22,6 +22,12 @@ If a job is aborted, delete current_dir
 Clean files in tmp
 Are python dictionaries keys called keys
 
+
+With plink you can use the -no-antispoof command
+
+Let user choose inventory file
+
+Try to create the best acl situation with Jobiation
 #############################References########################################3
 
 https://docs.ansible.com/ansible/latest/collections/cisco/ios/index.html#

@@ -1,16 +1,16 @@
 #!/usr/bin/env python3
 
 # Imports
-import sys # For exiting the script early with sys.exit();
-from datetime import datetime
-import re
-import pathlib
-import os
+import sys;
+from datetime import datetime;
+import re;
+import pathlib;
+import os;
 
 # Import options file
 sys.path.insert(1, '../');
-import options
-import functions
+import options;
+import functions;
 
 # Get current date and time
 now = datetime.now() # current date and time
@@ -22,7 +22,7 @@ jobs_dir = pathlib.Path("jobs").iterdir();
 for dir in jobs_dir:
     dirs.append(str(dir));
 if len(dirs) == 0:
-    print("\nThere are no jobs to search. Please run get_output so there will be some output to search.\n");
+    print("\nThere are no jobs to search. Please run get_output.py so there will be some output to search.\n");
     sys.exit();
 dirs_count = 0;
 dirs.sort(reverse=True);
@@ -90,7 +90,6 @@ reportfile = open(current_dir+"/report_"+date_time+".csv","w");
 # Populate report file
 for hostrecord in fileList:
     reportfile.write(hostrecord+"\n");
-    print(hostrecord);
 
 # Close report file
 reportfile.close();
