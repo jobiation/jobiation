@@ -1,0 +1,13 @@
+---
+- name: Example_pb
+  hosts: Example_Router
+  gather_facts: no
+  vars:
+   ansible_command_timeout: 30
+  tasks:
+   - name: Example_commands
+     cisco.ios.ios_command:
+      commands:
+       - config t
+       - end
+       - write

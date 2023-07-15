@@ -1,0 +1,15 @@
+---
+all:
+ vars:
+  ansible_python_interpreter: /usr/bin/python3
+  ansible_connection: network_cli
+  ansible_network_os: ios
+  ansible_port: 22
+  ansible_become: no
+  ansible_become_method: enable
+  ansible_become_password: rosebud 
+  ansible_user: me
+  ansible_password: swordfish
+ children:
+   jobiation_inventory:
+     hosts:
